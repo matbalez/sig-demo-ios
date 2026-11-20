@@ -1,0 +1,14 @@
+set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
+
+root := "../../.."
+manifest := "Rust/Cargo.toml"
+
+# Consumer builds intentionally exclude the upstream console and model runtime.
+check:
+    CARGO_TARGET_DIR={{root}}/.sig-demo/ios/paid-mesh-build cargo +1.95.0 check --manifest-path {{manifest}} --locked
+
+build target="aarch64-apple-darwin":
+    IPHONEOS_DEPLOYMENT_TARGET=16.0 MACOSX_DEPLOYMENT_TARGET=13.0 CARGO_TARGET_DIR={{root}}/.sig-demo/ios/paid-mesh-build cargo +1.95.0 build --manifest-path {{manifest}} --locked --release --target {{target}}
+
+test:
+    IPHONEOS_DEPLOYMENT_TARGET=16.0 MACOSX_DEPLOYMENT_TARGET=13.0 CARGO_TARGET_DIR={{root}}/.sig-demo/ios/paid-mesh-build cargo +1.95.0 test --manifest-path {{manifest}} --locked --release --target aarch64-apple-darwin --lib

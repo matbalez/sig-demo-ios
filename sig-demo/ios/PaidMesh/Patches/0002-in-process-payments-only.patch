@@ -1,0 +1,21 @@
+--- a/mesh/crates/mesh-llm-host-runtime/src/plugin/config.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/plugin/config.rs
+@@ -295,6 +295,18 @@
+ }
+ 
+ pub fn resolve_plugins(config: &MeshConfig, _host_mode: PluginHostMode) -> Result<ResolvedPlugins> {
++    // The mobile embedding owns its sole in-process engine. Config isolation
++    // alone does not isolate the desktop installed-plugin store. Never inspect
++    // that store or launch an external executable for this explicit mode.
++    if config.extra.get("sig_demo_embedded_payments_only").and_then(|value| value.as_bool()) == Some(true) {
++        if !payments_compiled_in() {
++            bail!("embedded payments engine is unavailable");
++        }
++        return Ok(ResolvedPlugins {
++            externals: vec![in_process_builtin_spec(PAYMENTS_PLUGIN_ID)],
++            inactive: Vec::new(),
++        });
++    }
+     let mut externals = Vec::new();
+     let mut inactive = Vec::new();
+     let mut names = BTreeMap::<String, ()>::new();

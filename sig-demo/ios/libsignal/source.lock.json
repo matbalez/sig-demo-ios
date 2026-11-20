@@ -1,0 +1,22 @@
+{
+  "repository": "https://github.com/signalapp/libsignal.git",
+  "tag": "v0.103.1",
+  "commit": "e8cc2dddd578859b4a029c9c94670b24ce2b616a",
+  "annotatedTagObject": "99eb62fb9ca588edf076fb98864eb42e693228c9",
+  "rustMinimum": "1.93.1",
+  "buildToolchain": "1.95.0",
+  "patch": "0001-private-localhost-net.patch",
+  "patchedFilesSHA256": {
+    "Cargo.lock": "320b3d1a8a2e43d3d2ef2fbd46680108e2bfd076c879188415c31578931ff0fe",
+    "rust/bridge/shared/Cargo.toml": "685f98d0f78528e86f66d603eec4b847dcba01e5409c8ddc316010ec74dcda26",
+    "rust/bridge/shared/src/net.rs": "82ccd4904b1285b4a1525e4ea35e8880e3a223c4c66ebdf44098c6d501c0a4ea",
+    "swift/Sources/LibSignalClient/KeyTransparency.swift": "e93c1d454b558c23a114d6bdf0ea4f75a3944c3ce5bc657ac9694fe3f049dcf7",
+    "swift/Sources/LibSignalClient/Net.swift": "362556ea09ed364ef67ec669153605a5c26e7a6527cc99352ae4d454a0ae93ec",
+    "swift/Sources/LibSignalClient/SecureValueRecoveryBackup.swift": "bf81eea1bfddfd462f89ff0483a5ce72aa2b7a1cbb83196282a48c8c86841f56",
+    "swift/Sources/SignalFfi/signal_ffi.h": "ceb86118c7dc544d2cf0749e0e75d8a3c71d55078060d3337012b84c701d8cef",
+    "swift/Tests/LibSignalClientTests/NetTests.swift": "f50ed2f069f761065830709ca05d5e760f6f0ce1a7dced38cf42225d7424655b",
+    "rust/bridge/shared/src/net/local_demo.rs": "edc1c4a4086001c33725198cfa6e0177d7c3f929216acd70e349c9d648fa8e02",
+    "rust/net/infra/src/dns.rs": "e27900a67c69c53083c9a516da1d07648f511cf473c47a552dc5b571074433ca",
+    "rust/bridge/shared/types/src/net.rs": "4f1cda4147430b08b6e77036f2faf70812fe6e3b47cfb8257627c0ab439a49ce"
+  }
+}

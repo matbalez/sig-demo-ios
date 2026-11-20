@@ -1,0 +1,32 @@
+--- a/mesh/crates/mesh-llm-host-runtime/src/plugin/mod.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/plugin/mod.rs
+@@ -704,6 +704,11 @@
+ 
+     pub async fn shutdown(&self) {
+         self.inner.shutting_down.store(true, Ordering::SeqCst);
++        // The inference bridge owns a PluginManager clone. Detach it before
++        // awaiting plugin shutdown so the manager cannot retain itself, its
++        // in-process runners, the Node, and the payment engine after stop.
++        let bridge = self.inner.rpc_bridge.lock().await.take();
++        drop(bridge);
+         for plugin in self.inner.plugins.values() {
+             plugin.shutdown().await;
+         }
+@@ -1384,7 +1389,16 @@
+     }
+ 
+     pub async fn set_rpc_bridge(&self, bridge: Option<Arc<dyn PluginRpcBridge>>) {
+-        *self.inner.rpc_bridge.lock().await = bridge;
++        let previous = {
++            let mut slot = self.inner.rpc_bridge.lock().await;
++            // Serialize this terminal check with shutdown's take: an install
++            // already waiting on the slot must not recreate the ownership cycle.
++            if bridge.is_some() && self.inner.shutting_down.load(Ordering::Acquire) {
++                return;
++            }
++            std::mem::replace(&mut *slot, bridge)
++        };
++        drop(previous);
+     }
+ 
+     pub(crate) async fn current_rpc_bridge(&self) -> Option<Arc<dyn PluginRpcBridge>> {

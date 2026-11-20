@@ -1,0 +1,388 @@
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -189,7 +189,7 @@
+ version = "1"
+ default-features = false
+ 
+-[target.'cfg(target_os = "macos")'.dependencies.llama-cpp-2]
++[target.'cfg(any(target_os = "ios", target_os = "macos"))'.dependencies.llama-cpp-2]
+ version = "=0.1.146"
+ features = [
+     "sampler",
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -708,6 +708,33 @@
+ }
+ 
+ impl LocalInferenceProvider {
++    /// Run the caller's context packing with the same loaded GGUF, Jinja renderer
++    /// and tokenizer that will be used for this native-tool request.
++    pub async fn with_native_prompt_counter<T>(
++        &self, name: &str, system: &str, tools: &[Tool],
++        fit: impl FnOnce(&mut dyn FnMut(&[Message]) -> Result<usize, ProviderError>) -> Result<T, ProviderError>,
++    ) -> Result<T, ProviderError> {
++        let settings = config_resolver::model_settings(name).map_err(|e| ProviderError::ExecutionError(e.to_string()))?;
++        let key = ModelCacheKey::new(LLAMACPP_BACKEND_ID, name, settings.chat_template.clone());
++        let slot = self.runtime.get_or_create_model_slot(key);
++        let mut state = slot.state.lock().await;
++        let ModelSlotState::Loaded { model, .. } = &mut *state else {
++            return Err(ProviderError::ExecutionError("GGUF is not loaded".into()));
++        };
++        let tools_json = if tools.is_empty() { None } else {
++            let specs = goose_provider_types::formats::openai::format_tools(tools)
++                .map_err(|e| ProviderError::ExecutionError(e.to_string()))?;
++            Some(serde_json::to_string(&specs).map_err(|e| ProviderError::ExecutionError(e.to_string()))?)
++        };
++        fit(&mut |messages| llamacpp::count_native_prompt(&mut **model, name, &settings, system, messages, tools_json.as_deref()))
++    }
++
++    pub async fn wait_for_model_idle(&self, name: &str) {
++        let Ok(settings) = config_resolver::model_settings(name) else { return; };
++        let slot = self.runtime.get_or_create_model_slot(ModelCacheKey::new(LLAMACPP_BACKEND_ID, name, settings.chat_template));
++        drop(slot.state.lock().await);
++    }
++
+     pub async fn from_env() -> Result<Self> {
+         let runtime = InferenceRuntime::get_or_init()?;
+         Ok(Self {
+--- a/src/llamacpp/inference_engine.rs
++++ b/src/llamacpp/inference_engine.rs
+@@ -234,7 +234,7 @@
+     params
+ }
+ 
+-pub(super) fn build_sampler(settings: &crate::model::ModelSettings) -> LlamaSampler {
++pub(super) fn build_sampler(n_vocab: i32, settings: &crate::model::ModelSettings) -> LlamaSampler {
+     use crate::model::SamplingConfig;
+ 
+     let has_penalties = settings.repeat_penalty != 1.0
+@@ -245,6 +245,7 @@
+ 
+     if has_penalties {
+         samplers.push(LlamaSampler::penalties(
++            n_vocab,
+             settings.repeat_last_n,
+             settings.repeat_penalty,
+             settings.frequency_penalty,
+@@ -304,7 +305,7 @@
+         n_ctx_train,
+         memory_max_ctx,
+     );
+-    if let Some(mem_max) = memory_max_ctx {
++    if let Some(mem_max) = memory_max_ctx.filter(|_| settings.context_size.is_none()) {
+         if prompt_token_count > mem_max {
+             return Err(ProviderError::ContextLengthExceeded(format!(
+                 "Prompt ({} tokens) exceeds estimated memory capacity ({} tokens). \
+@@ -345,6 +346,9 @@
+             .map_err(|e| ProviderError::ExecutionError(format!("Prefill decode failed: {}", e)))?;
+     }
+ 
++    if !ctx.has_metal_allocations() {
++        return Err(ProviderError::ExecutionError("Metal inference buffers unavailable".into()));
++    }
+     Ok(ctx)
+ }
+ 
+@@ -422,20 +426,20 @@
+     Ok((llama_ctx, prompt_token_count, effective_ctx))
+ }
+ 
+-pub(super) fn prepare_generation<'model>(
+-    ctx: &mut GenerationContext<'model>,
++pub(super) fn render_chat(
++    model: &LlamaModel,
++    template: &LlamaChatTemplate,
++    settings: &ModelSettings,
+     oai_messages_json: &str,
+-    full_tools_json: Option<&str>,
+-    compact_tools_json: Option<&str>,
+-) -> Result<PreparedGeneration<'model>, ProviderError> {
+-    let apply_template = |tools: Option<&str>| {
+-        let params = OpenAIChatTemplateParams {
++    tools: Option<&str>,
++) -> Result<ChatTemplateResult, llama_cpp_2::ApplyChatTemplateError> {
++    let params = OpenAIChatTemplateParams {
+             messages_json: oai_messages_json,
+             tools_json: tools,
+             tool_choice: None,
+             json_schema: None,
+             grammar: None,
+-            reasoning_format: if ctx.settings.enable_thinking {
++            reasoning_format: if settings.enable_thinking {
+                 Some("auto")
+             } else {
+                 None
+@@ -444,15 +448,22 @@
+             add_generation_prompt: true,
+             use_jinja: true,
+             parallel_tool_calls: false,
+-            enable_thinking: ctx.settings.enable_thinking,
++            enable_thinking: settings.enable_thinking,
+             add_bos: false,
+             add_eos: false,
+             parse_tool_calls: true,
+         };
+-        ctx.loaded
+-            .model
+-            .apply_chat_template_oaicompat(ctx.template, &params)
+-    };
++        model
++            .apply_chat_template_oaicompat(template, &params)
++}
++
++pub(super) fn prepare_generation<'model>(
++    ctx: &mut GenerationContext<'model>,
++    oai_messages_json: &str,
++    full_tools_json: Option<&str>,
++    compact_tools_json: Option<&str>,
++) -> Result<PreparedGeneration<'model>, ProviderError> {
++    let apply_template = |tools: Option<&str>| render_chat(&ctx.loaded.model, ctx.template, ctx.settings, oai_messages_json, tools);
+ 
+     let min_generation_headroom = 512;
+     let n_ctx_train = ctx.loaded.model.n_ctx_train() as usize;
+@@ -555,7 +566,7 @@
+     effective_ctx: usize,
+     mut on_piece: impl FnMut(&str) -> Result<TokenAction, ProviderError>,
+ ) -> Result<i32, ProviderError> {
+-    let mut sampler = build_sampler(settings);
++    let mut sampler = build_sampler(model.n_vocab(), settings);
+     let context_headroom = effective_ctx.saturating_sub(prompt_token_count);
+     let max_output = if let Some(max) = settings.max_output_tokens {
+         context_headroom.min(max)
+--- a/src/llamacpp/inference_native_tools.rs
++++ b/src/llamacpp/inference_native_tools.rs
+@@ -18,6 +18,9 @@
+     compact_tools: Option<&str>,
+ ) -> Result<(), ProviderError> {
+     let prepared = prepare_generation(ctx, oai_messages_json, full_tools_json, compact_tools)?;
++    if !ctx.settings.enable_thinking {
++        return generate_answer_only(ctx, prepared);
++    }
+     let template_result = prepared.template_result;
+     let mut llama_ctx = prepared.llama_ctx;
+     let prompt_token_count = prepared.prompt_token_count;
+@@ -36,9 +39,6 @@
+ 
+     // Feed the generation prompt to the parser so it knows the context.
+     // The model may echo this prefix; the parser needs to see it to strip it.
+-    if !template_result.generation_prompt.is_empty() {
+-        let _ = stream_parser.update(&template_result.generation_prompt, true);
+-    }
+ 
+     // Accumulate tool calls across streaming deltas
+     let mut accumulated_tool_calls: Vec<Value> = Vec::new();
+@@ -225,6 +225,107 @@
+     Ok(())
+ }
+ 
++/// Disabled reasoning is a presentation boundary. A later model token can close
++/// an implicit reasoning span or turn a provisional answer into a tool call.
++/// No provisional text may reach the GDK message store or the UI.
++fn generate_answer_only(
++    ctx: &mut GenerationContext<'_>,
++    mut prepared: super::inference_engine::PreparedGeneration<'_>,
++) -> Result<(), ProviderError> {
++    let mut raw = String::new();
++    let mut stops = StopSuffixTrimmer::new(&prepared.template_result.additional_stops);
++    let mut stopped = false;
++    let output_count = generation_loop(
++        &ctx.loaded.model, &mut prepared.llama_ctx, ctx.settings, prepared.prompt_token_count,
++        prepared.effective_ctx, |piece| {
++            if ctx.tx.is_closed() {
++                return Err(ProviderError::ExecutionError("Local generation cancelled".into()));
++            }
++            let (accepted, matched) = stops.push(piece);
++            raw.push_str(&accepted);
++            stopped = matched;
++            Ok(if matched { TokenAction::Stop } else { TokenAction::Continue })
++        },
++    )?;
++
++    if !stopped {
++        raw.push_str(&stops.finish());
++    }
++    // A token ceiling cannot guarantee that the model completed its channel.
++    // Still report actual usage (also used for a one-token load probe).
++    if stopped || ctx.settings.max_output_tokens.is_none_or(|limit| output_count < limit as i32) {
++        let parse = |raw: &str| -> Result<Value, ProviderError> {
++            let json = prepared.template_result.parse_response_oaicompat(raw, false)
++                .map_err(|_| ProviderError::ExecutionError("Invalid native model completion".into()))?;
++            serde_json::from_str(&json)
++                .map_err(|_| ProviderError::ExecutionError("Invalid native message".into()))
++        };
++        let content = completed_message_content(&raw, parse)?;
++        if !content.is_empty() {
++            let mut message = Message::new(rmcp::model::Role::Assistant, chrono::Utc::now().timestamp(), content);
++            message.id = Some(ctx.message_id.to_owned());
++            ctx.tx.blocking_send(Ok((Some(message), None)))
++                .map_err(|_| ProviderError::ExecutionError("Local generation cancelled".into()))?;
++        }
++    } else {
++        // GDK distinguishes token exhaustion from a naturally empty answer.
++        // Report only its terminal metadata; the unfinished model channels stay private.
++        let mut marker = Message::assistant().with_visibility(false, false);
++        marker.id = Some(ctx.message_id.to_owned());
++        marker.metadata.output_token_limit_reached = true;
++        ctx.tx.blocking_send(Ok((Some(marker), None)))
++            .map_err(|_| ProviderError::ExecutionError("Local generation cancelled".into()))?;
++    }
++
++    let usage = finalize_usage(ctx.log, std::mem::take(&mut ctx.model_name), "native",
++        prepared.prompt_token_count, output_count, None);
++    let _ = ctx.tx.blocking_send(Ok((None, Some(usage))));
++    Ok(())
++}
++
++fn completed_message_content(
++    raw: &str,
++    parse: impl Fn(&str) -> Result<Value, ProviderError>,
++) -> Result<Vec<MessageContent>, ProviderError> {
++    use goose_provider_types::thinking::{completed_answer_text, completed_answer_with_opaque_ranges};
++    let original = parse(raw)?;
++    let mut opaque = Vec::new();
++    if let Some(ranges) = original.get("native_argument_ranges").and_then(Value::as_array) {
++        for pair in ranges {
++            let range = pair.as_array().filter(|p| p.len() == 2)
++                .and_then(|p| Some(usize::try_from(p[0].as_u64()?).ok()?..usize::try_from(p[1].as_u64()?).ok()?))
++                .filter(|r| r.start < r.end && raw.get(r.clone()).is_some())
++                .ok_or_else(|| ProviderError::ExecutionError("Invalid native argument boundaries".into()))?;
++            opaque.push(range);
++        }
++    }
++    // Tool syntax inside reasoning is discarded. A reasoning delimiter inside
++    // a native argument is ordinary tool data and must survive byte-for-byte.
++    let visible_wire = completed_answer_with_opaque_ranges(raw, &opaque);
++    if visible_wire.trim().is_empty() {
++        return Ok(Vec::new());
++    }
++    let native = if visible_wire == raw { original } else { parse(&visible_wire)? };
++    // Use only the native parser's structural calls. A tool turn has no
++    // user-visible prose, even when the model narrates before making the call.
++    if let Some(calls) = native.get("tool_calls").and_then(Value::as_array).filter(|c| !c.is_empty()) {
++        let mut calls = calls.clone();
++        for (index, call) in calls.iter_mut().enumerate() {
++            let fields = call.as_object_mut().ok_or_else(||
++                ProviderError::ExecutionError("Invalid native tool call".into()))?;
++            fields.insert("index".into(), Value::from(index));
++        }
++        let requests = extract_oai_tool_call_contents(&calls);
++        if requests.len() != calls.len() {
++            return Err(ProviderError::ExecutionError("Invalid native tool call".into()));
++        }
++        return Ok(requests);
++    }
++
++    let text = completed_answer_text(native.get("content").and_then(Value::as_str).unwrap_or(""));
++    Ok(if text.trim().is_empty() { Vec::new() } else { vec![MessageContent::text(text)] })
++}
++
+ /// Merge OpenAI streaming deltas by `index` into `MessageContent` items.
+ ///
+ /// Returns one `ToolRequest` content per distinct tool call index. The caller
+@@ -292,28 +393,47 @@
+ #[cfg(test)]
+ mod tests {
+     use super::*;
+-    use serde_json::json;
+-
+-    fn get_content_tool_call_name(content: &MessageContent) -> &str {
+-        match content {
+-            MessageContent::ToolRequest(req) => {
+-                let call = req.tool_call.as_ref().unwrap();
+-                &call.name
+-            }
+-            _ => panic!("Expected ToolRequest"),
+-        }
+-    }
+-
+-    fn get_content_tool_call_args(
+-        content: &MessageContent,
+-    ) -> Option<&serde_json::Map<String, Value>> {
+-        match content {
+-            MessageContent::ToolRequest(req) => {
+-                let call = req.tool_call.as_ref().unwrap();
+-                call.arguments.as_ref()
+-            }
+-            _ => panic!("Expected ToolRequest"),
+-        }
++    #[test]
++    fn completed_native_answer_strips_retracted_content_and_obeys_native_channels() {
++        let text_message = |content: &str| serde_json::json!({"content":content});
++        let raw = "<think></think>6 - 1 = 5.</think>**5**";
++        for split in raw.char_indices().map(|(at, _)| at) {
++            let mut buffered = String::new();
++            buffered.push_str(&raw[..split]);
++            buffered.push_str(&raw[split..]);
++            let output = completed_message_content(&buffered,
++                |s| Ok(text_message(s))).unwrap();
++            assert_eq!(output[0].as_text(), Some("**5**"));
++        }
++        let call = serde_json::json!({"content":"I will inspect my tools","reasoning_content":"plan",
++            "tool_calls":[{"id":"1","type":"function","function":{"name":"search","arguments":"{}"}}]});
++        let hidden_example = "<tool_call>example</tool_call>";
++        let visible_call = "<tool_call>actual</tool_call>";
++        for (input, expected) in [
++            (format!("<think>{hidden_example}</think>clear answer"), "clear answer"),
++            (format!("<think></think>{hidden_example}</think>clear answer"), "clear answer"),
++            (format!("hidden</think>{visible_call}"), visible_call),
++        ] {
++            let results = completed_message_content(&input, |wire| {
++                Ok(if wire == visible_call { call.clone() } else { text_message(wire) })
++            }).unwrap();
++            assert_eq!(results.len(), 1);
++            if expected == visible_call { assert!(results[0].as_tool_request().is_some()); }
++            else { assert_eq!(results[0].as_text(), Some(expected)); }
++        }
++        assert!(completed_message_content("potential prefix</th", |s| Ok(text_message(s))).unwrap().is_empty());
++        let raw_arg = "tool(literal </think> syntax)";
++        let arg_pos = raw_arg.find("literal").unwrap();
++        let calls = completed_message_content(raw_arg, |wire| {
++            assert_eq!(raw_arg, wire);
++            let mut msg = call.clone();
++            msg["native_argument_ranges"] = serde_json::json!([[arg_pos, raw_arg.len()-1]]);
++            msg["tool_calls"][0]["function"]["arguments"] = serde_json::json!({"query":"literal </think> syntax"}).to_string().into();
++            Ok(msg)
++        }).unwrap();
++        let request = calls[0].as_tool_request().unwrap().tool_call.as_ref().unwrap();
++        assert_eq!(request.arguments.as_ref().unwrap()["query"], "literal </think> syntax");
++        assert!(completed_message_content("visible", |_| Err(ProviderError::ExecutionError("parser failed".into()))).is_err());
+     }
+ 
+     #[test]
+--- a/src/llamacpp/mod.rs
++++ b/src/llamacpp/mod.rs
+@@ -28,6 +28,21 @@
+ 
+ pub(super) const LLAMACPP_BACKEND_ID: &str = "llamacpp";
+ 
++pub(super) fn count_native_prompt(
++    loaded: &mut dyn BackendLoadedModel, name: &str, settings: &ModelSettings,
++    system: &str, messages: &[goose_provider_types::conversation::message::Message],
++    tools_json: Option<&str>,
++) -> Result<usize, ProviderError> {
++    let loaded = loaded.as_any_mut().downcast_mut::<LoadedModel>()
++        .ok_or_else(|| ProviderError::ExecutionError("Expected loaded GGUF".into()))?;
++    let template = select_generation_template(name, &loaded.model, &loaded.templates, true, tools_json.is_some())?;
++    let json = build_openai_messages_json(system, messages, None);
++    let prompt = inference_engine::render_chat(&loaded.model, template, settings, &json, tools_json)
++        .map_err(|e| ProviderError::ExecutionError(e.to_string()))?.prompt;
++    loaded.model.str_to_token(&prompt, llama_cpp_2::model::AddBos::Never)
++        .map(|t| t.len()).map_err(|e| ProviderError::ExecutionError(e.to_string()))
++}
++
+ const CODE_EXECUTION_TOOL: &str = "code_execution__execute_typescript";
+ 
+ pub(super) fn builtin_chat_template_names() -> Vec<String> {
+@@ -55,11 +70,7 @@
+ }
+ 
+ fn template_result_supports_native_tool_calling(result: &ChatTemplateResult) -> bool {
+-    result.parse_tool_calls
+-        && result
+-            .parser
+-            .as_deref()
+-            .is_some_and(|parser| !parser.trim().is_empty())
++    result.parse_tool_calls && result.parser.is_some()
+ }
+ 
+ fn supports_native_tool_calling(

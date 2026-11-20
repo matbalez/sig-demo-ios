@@ -1,0 +1,143 @@
+--- a/mesh/crates/mesh-llm-host-runtime/src/sdk/embedded_config.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/sdk/embedded_config.rs
+@@ -145,8 +145,27 @@
+     pub release_signer_keys: Vec<String>,
+ }
+ 
++/// An in-memory endpoint key with redacted Debug and zeroization on drop.
++#[derive(Clone, Debug)]
++pub struct EmbeddedClientSecretKey(iroh::SecretKey);
++
++impl PartialEq for EmbeddedClientSecretKey {
++    fn eq(&self, other: &Self) -> bool {
++        self.0.public() == other.0.public()
++    }
++}
++impl Eq for EmbeddedClientSecretKey {}
++impl EmbeddedClientSecretKey {
++    pub(crate) fn secret_key(&self) -> iroh::SecretKey {
++        self.0.clone()
++    }
++}
++
+ #[derive(Clone, Debug, Default, Eq, PartialEq)]
+ pub struct EmbeddedMeshAdmissionConfig {
++    /// Optional stable client endpoint identity supplied in memory by an
++    /// embedder. SecretKey redacts Debug and zeroizes on drop. Never serialized.
++    pub client_secret_key: Option<EmbeddedClientSecretKey>,
+     pub owner_key: Option<PathBuf>,
+     pub owner_required: bool,
+     pub node_label: Option<String>,
+@@ -209,6 +228,12 @@
+ }
+ 
+ impl EmbeddedMeshNodeBuilder {
++    /// Keep a paid buyer's authenticated identity stable for v3 recovery.
++    /// No environment or host keystore is read for this key.
++    pub fn client_secret_key(mut self, key: iroh::SecretKey) -> Self {
++        self.config.admission.client_secret_key = Some(EmbeddedClientSecretKey(key));
++        self
++    }
+     pub fn mode(mut self, mode: EmbeddedMeshNodeMode) -> Self {
+         self.config.mode = mode;
+         self
+--- a/mesh/crates/mesh-llm-host-runtime/src/sdk.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/sdk.rs
+@@ -268,6 +268,7 @@
+         listen_all: config.network.listen_all,
+         enumerate_host: config.network.enumerate_host,
+         owner_key: config.admission.owner_key.clone(),
++        client_secret_key: config.admission.client_secret_key.clone(),
+         owner_required: config.admission.owner_required,
+         node_label: config.admission.node_label.clone(),
+         trust_policy: config.admission.trust_policy.map(Into::into),
+--- a/mesh/crates/mesh-llm-host-runtime/src/runtime/options.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/runtime/options.rs
+@@ -26,6 +26,8 @@
+ 
+ #[derive(Clone, Debug)]
+ pub struct RuntimeOptions {
++    /// Embedded client endpoint key; redacted Debug, never config serialized.
++    pub client_secret_key: Option<crate::sdk::EmbeddedClientSecretKey>,
+     pub log_format: LogFormat,
+     pub debug: bool,
+     pub skippy_metrics_otlp_grpc: Option<String>,
+@@ -123,6 +125,7 @@
+ impl Default for RuntimeOptions {
+     fn default() -> Self {
+         Self {
++            client_secret_key: None,
+             log_format: LogFormat::Pretty,
+             debug: false,
+             skippy_metrics_otlp_grpc: None,
+--- a/mesh/crates/mesh-llm-host-runtime/src/runtime/run_auto.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/runtime/run_auto.rs
+@@ -83,6 +83,7 @@
+ }
+ 
+ pub(crate) struct EmbeddedRuntimeOptions {
++    pub(crate) client_secret_key: Option<crate::sdk::EmbeddedClientSecretKey>,
+     pub(crate) mode: EmbeddedRuntimeMode,
+     pub(crate) models: Vec<String>,
+     pub(crate) join: Vec<String>,
+@@ -192,6 +193,7 @@
+ 
+ pub(super) fn options_from_embedded_options(embedded: EmbeddedRuntimeOptions) -> RuntimeOptions {
+     RuntimeOptions {
++        client_secret_key: embedded.client_secret_key,
+         log_format: embedded.log_format,
+         client: matches!(embedded.mode, EmbeddedRuntimeMode::Client),
+         model: embedded.models.into_iter().map(PathBuf::from).collect(),
+@@ -924,6 +926,10 @@
+         Some(owner_config),
+         options.config.as_deref(),
+         startup_mesh_creation_state.requirements.clone(),
++        options
++            .client_secret_key
++            .as_ref()
++            .map(|key| key.secret_key()),
+     )
+     .await?;
+     node.set_swarm_capture_recorder(swarm_capture);
+--- a/mesh/crates/mesh-llm-host-runtime/src/mesh/node.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/mesh/node.rs
+@@ -730,8 +730,18 @@
+         owner_config: Option<OwnerRuntimeConfig>,
+         config_path: Option<&std::path::Path>,
+         local_mesh_requirements: crate::MeshRequirements,
++        client_secret_key: Option<SecretKey>,
+     ) -> Result<(Self, TunnelChannels)> {
+-        let secret_key = startup_secret_key(&role).await?;
++        let secret_key = match client_secret_key {
++            Some(key) => {
++                anyhow::ensure!(
++                    matches!(role, NodeRole::Client),
++                    "embedded client key requires client mode"
++                );
++                key
++            }
++            None => startup_secret_key(&role).await?,
++        };
+         let endpoint = bind_mesh_endpoint(secret_key.clone(), relay, quic_bind).await?;
+         if relay.policy.uses_relay() {
+             // Wait briefly for relay connection so the invite token includes the relay URL.
+--- a/mesh/crates/mesh-llm-host-runtime/src/network/openai/transport_tests/durable_artifacts.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/network/openai/transport_tests/durable_artifacts.rs
+@@ -27,6 +27,7 @@
+         None,
+         None,
+         crate::MeshRequirements::unrestricted(),
++        None,
+     )
+     .await
+     .expect("start HTTP tunnel test node");
+--- a/mesh/crates/mesh-llm-host-runtime/src/mesh/tests/connections.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/mesh/tests/connections.rs
+@@ -31,6 +31,7 @@
+             None,
+             None,
+             crate::MeshRequirements::unrestricted(),
++            None,
+         )
+         .await
+         .expect("start tunnel identity test node")

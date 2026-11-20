@@ -1,0 +1,492 @@
+--- a/src/context.rs
++++ b/src/context.rs
+@@ -39,6 +39,11 @@
+ }
+ 
+ impl<'model> LlamaContext<'model> {
++    /// Whether this context holds both model weights and compute buffers on Metal.
++    pub fn has_metal_allocations(&self) -> bool {
++        unsafe { llama_cpp_sys_2::llama_rs_has_metal_allocations(self.context.as_ptr()) }
++    }
++
+     pub(crate) fn new(
+         llama_model: &'model LlamaModel,
+         llama_context: NonNull<llama_cpp_sys_2::llama_context>,
+@@ -365,7 +370,7 @@
+ 
+     /// Print a breakdown of per-device memory use to the default logger.
+     pub fn print_memory_breakdown(&self) {
+-        unsafe { llama_cpp_sys_2::llama_memory_breakdown_print(self.context.as_ptr()) }
++        unsafe { llama_cpp_sys_2::llama_rs_print_memory_breakdown(self.context.as_ptr()) }
+     }
+ }
+ 
+--- a/src/model.rs
++++ b/src/model.rs
+@@ -116,6 +116,19 @@
+     pub value: String,
+     /// Token id for token triggers.
+     pub token: Option<LlamaToken>,
++}
++
++/// The immutable template parser owned by llama.cpp.
++#[derive(Debug, PartialEq, Eq)]
++pub struct ChatTemplateParser(NonNull<llama_cpp_sys_2::llama_rs_chat_parser>);
++// The arena is immutable, and a parsing session copies it before use.
++unsafe impl Send for ChatTemplateParser {}
++unsafe impl Sync for ChatTemplateParser {}
++impl Drop for ChatTemplateParser {
++    fn drop(&mut self) {
++        // Ownership is transferred out of the template result once.
++        unsafe { llama_cpp_sys_2::llama_rs_chat_parser_free(self.0.as_ptr()) };
++    }
+ }
+ 
+ /// Result of applying a chat template with tool grammar support.
+@@ -135,8 +148,8 @@
+     pub additional_stops: Vec<String>,
+     /// Chat format used for parsing responses.
+     pub chat_format: i32,
+-    /// Optional serialized PEG parser for tool-call parsing.
+-    pub parser: Option<String>,
++    /// Optional owned PEG parser for tool-call parsing.
++    pub parser: Option<std::sync::Arc<ChatTemplateParser>>,
+     /// Prefix that must be prepended for parser-compatible response reconstruction.
+     pub generation_prompt: String,
+     /// Whether tool calls should be parsed from the response.
+@@ -1017,14 +1030,8 @@
+                     .to_vec();
+                 Some(String::from_utf8(grammar_bytes)?)
+             };
+-            let parser = if raw_result.parser.is_null() {
+-                None
+-            } else {
+-                let parser_bytes = unsafe { CStr::from_ptr(raw_result.parser) }
+-                    .to_bytes()
+-                    .to_vec();
+-                Some(String::from_utf8(parser_bytes)?)
+-            };
++            let parser = NonNull::new(std::mem::replace(&mut raw_result.parser, ptr::null_mut()))
++                .map(|handle| std::sync::Arc::new(ChatTemplateParser(handle)));
+             let generation_prompt = if raw_result.generation_prompt.is_null() {
+                 String::new()
+             } else {
+@@ -1222,14 +1229,8 @@
+                     .to_vec();
+                 Some(String::from_utf8(grammar_bytes)?)
+             };
+-            let parser = if raw_result.parser.is_null() {
+-                None
+-            } else {
+-                let parser_bytes = unsafe { CStr::from_ptr(raw_result.parser) }
+-                    .to_bytes()
+-                    .to_vec();
+-                Some(String::from_utf8(parser_bytes)?)
+-            };
++            let parser = NonNull::new(std::mem::replace(&mut raw_result.parser, ptr::null_mut()))
++                .map(|handle| std::sync::Arc::new(ChatTemplateParser(handle)));
+             let generation_prompt = if raw_result.generation_prompt.is_null() {
+                 String::new()
+             } else {
+@@ -1348,7 +1349,7 @@
+         is_partial: bool,
+     ) -> Result<String, ChatParseError> {
+         let text_cstr = CString::new(text)?;
+-        let parser_cstr = self.parser.as_deref().map(CString::new).transpose()?;
++        let parser = self.parser.as_ref().map_or(ptr::null(), |p| p.0.as_ptr().cast_const());
+         let generation_prompt_cstr = if self.generation_prompt.is_empty() {
+             None
+         } else {
+@@ -1361,9 +1362,7 @@
+                 is_partial,
+                 self.chat_format,
+                 self.parse_tool_calls,
+-                parser_cstr
+-                    .as_ref()
+-                    .map_or(ptr::null(), |cstr| cstr.as_ptr()),
++                parser,
+                 generation_prompt_cstr
+                     .as_ref()
+                     .map_or(ptr::null(), |cstr| cstr.as_ptr()),
+@@ -1388,7 +1387,7 @@
+ 
+     /// Initialize a streaming parser for OpenAI-compatible chat deltas.
+     pub fn streaming_state_oaicompat(&self) -> Result<ChatParseStateOaicompat, ChatParseError> {
+-        let parser_cstr = self.parser.as_deref().map(CString::new).transpose()?;
++        let parser = self.parser.as_ref().map_or(ptr::null(), |p| p.0.as_ptr().cast_const());
+         let generation_prompt_cstr = if self.generation_prompt.is_empty() {
+             None
+         } else {
+@@ -1398,9 +1397,7 @@
+             llama_cpp_sys_2::llama_rs_chat_parse_state_init_oaicompat(
+                 self.chat_format,
+                 self.parse_tool_calls,
+-                parser_cstr
+-                    .as_ref()
+-                    .map_or(ptr::null(), |cstr| cstr.as_ptr()),
++                parser,
+                 generation_prompt_cstr
+                     .as_ref()
+                     .map_or(ptr::null(), |cstr| cstr.as_ptr()),
+--- a/src/model/params.rs
++++ b/src/model/params.rs
+@@ -156,8 +156,8 @@
+             .field("n_gpu_layers", &self.params.n_gpu_layers)
+             .field("main_gpu", &self.params.main_gpu)
+             .field("vocab_only", &self.params.vocab_only)
+-            .field("use_mmap", &self.params.use_mmap)
+-            .field("use_mlock", &self.params.use_mlock)
++            .field("use_mmap", &self.use_mmap())
++            .field("use_mlock", &self.use_mlock())
+             .field("split_mode", &self.split_mode())
+             .field("devices", &self.devices)
+             .field("kv_overrides", &"vec of kv_overrides")
+@@ -289,7 +289,7 @@
+ impl LlamaModelParams {
+     /// Automatically fit model parameters to available device memory.
+     ///
+-    /// Wraps llama.cpp's `llama_params_fit`, which determines optimal `n_gpu_layers`,
++    /// Wraps llama.cpp's `common_fit_params`, which determines optimal `n_gpu_layers`,
+     /// `tensor_split`, and `tensor_buft_overrides` based on available VRAM. On success
+     /// the model and context params are updated in place.
+     ///
+@@ -332,6 +332,9 @@
+         log_level: llama_cpp_sys_2::ggml_log_level,
+     ) -> Result<FitResult, FitError> {
+         let max_devices = unsafe { llama_cpp_sys_2::llama_max_devices() };
++        if margins.len() < max_devices {
++            return Err(FitError::Error);
++        }
+         let max_buft = unsafe { llama_cpp_sys_2::llama_max_tensor_buft_overrides() };
+ 
+         // Allocate tensor_split output buffer.
+@@ -353,7 +356,7 @@
+         self.params.tensor_buft_overrides = null();
+ 
+         let status = unsafe {
+-            llama_cpp_sys_2::llama_params_fit(
++            llama_cpp_sys_2::llama_rs_fit_params(
+                 model_path.as_ptr(),
+                 &raw mut self.params,
+                 &raw mut cparams.context_params,
+@@ -366,8 +369,8 @@
+         };
+ 
+         match status {
+-            llama_cpp_sys_2::LLAMA_PARAMS_FIT_STATUS_SUCCESS => {}
+-            llama_cpp_sys_2::LLAMA_PARAMS_FIT_STATUS_FAILURE => return Err(FitError::Failure),
++            llama_cpp_sys_2::LLAMA_RS_FIT_SUCCESS => {}
++            llama_cpp_sys_2::LLAMA_RS_FIT_FAILURE => return Err(FitError::Failure),
+             _ => return Err(FitError::Error),
+         }
+ 
+@@ -403,13 +406,15 @@
+     /// use mmap if possible
+     #[must_use]
+     pub fn use_mmap(&self) -> bool {
+-        self.params.use_mmap
++        use llama_cpp_sys_2::{LLAMA_LOAD_MODE_AUTO, LLAMA_LOAD_MODE_MMAP, LLAMA_LOAD_MODE_MMAP_MLOCK};
++        matches!(self.params.load_mode, LLAMA_LOAD_MODE_AUTO | LLAMA_LOAD_MODE_MMAP | LLAMA_LOAD_MODE_MMAP_MLOCK)
+     }
+ 
+     /// force system to keep model in RAM
+     #[must_use]
+     pub fn use_mlock(&self) -> bool {
+-        self.params.use_mlock
++        use llama_cpp_sys_2::{LLAMA_LOAD_MODE_MLOCK, LLAMA_LOAD_MODE_MMAP_MLOCK};
++        matches!(self.params.load_mode, LLAMA_LOAD_MODE_MLOCK | LLAMA_LOAD_MODE_MMAP_MLOCK)
+     }
+ 
+     /// get the split mode
+@@ -479,15 +484,25 @@
+     /// sets `use_mmap`
+     #[must_use]
+     pub fn with_use_mmap(mut self, use_mmap: bool) -> Self {
+-        self.params.use_mmap = use_mmap;
++        self.set_load_mode(use_mmap, self.use_mlock());
+         self
+     }
+ 
+     /// sets `use_mlock`
+     #[must_use]
+     pub fn with_use_mlock(mut self, use_mlock: bool) -> Self {
+-        self.params.use_mlock = use_mlock;
++        self.set_load_mode(self.use_mmap(), use_mlock);
+         self
++    }
++
++    fn set_load_mode(&mut self, mmap: bool, mlock: bool) {
++        use llama_cpp_sys_2::{LLAMA_LOAD_MODE_MLOCK, LLAMA_LOAD_MODE_MMAP, LLAMA_LOAD_MODE_MMAP_MLOCK, LLAMA_LOAD_MODE_NONE};
++        self.params.load_mode = match (mmap, mlock) {
++            (true, true) => LLAMA_LOAD_MODE_MMAP_MLOCK,
++            (true, false) => LLAMA_LOAD_MODE_MMAP,
++            (false, true) => LLAMA_LOAD_MODE_MLOCK,
++            (false, false) => LLAMA_LOAD_MODE_NONE,
++        };
+     }
+ 
+     /// sets `split_mode`
+--- a/src/mtmd.rs
++++ b/src/mtmd.rs
+@@ -8,6 +8,7 @@
+ use std::ffi::{CStr, CString};
+ use std::ptr::NonNull;
+ use std::slice;
++use std::sync::{Arc, Mutex};
+ 
+ use crate::context::LlamaContext;
+ use crate::model::LlamaModel;
+@@ -142,7 +143,7 @@
+ /// text, images, and audio through llama.cpp's multimodal interface.
+ #[derive(Debug)]
+ pub struct MtmdContext {
+-    pub(crate) context: NonNull<llama_cpp_sys_2::mtmd_context>,
++    context: Arc<ContextOwner>,
+ }
+ 
+ // MtmdContext is thread safe
+@@ -184,7 +185,9 @@
+         };
+ 
+         let context = NonNull::new(context).ok_or(MtmdInitError::NullResult)?;
+-        Ok(Self { context })
++        Ok(Self {
++            context: Arc::new(ContextOwner(context)),
++        })
+     }
+ 
+     /// Check whether non-causal attention mask is needed before `llama_decode`.
+@@ -274,10 +277,17 @@
+         let text_cstring = CString::new(text.text)?;
+         let input_text = llama_cpp_sys_2::mtmd_input_text {
+             text: text_cstring.as_ptr(),
++            text_len: text_cstring.as_bytes().len(),
+             add_special: text.add_special,
+             parse_special: text.parse_special,
+         };
+ 
++        // A lazy video's decoder has a cursor. Serialize native access to a
++        // shared bitmap and its ID. A stable lock order also permits duplicates.
++        let mut owners: Vec<_> = bitmaps.iter().map(|b| &*b.bitmap).collect();
++        owners.sort_unstable_by_key(|b| b.as_ptr());
++        owners.dedup_by_key(|b| b.as_ptr());
++        let _guards: Vec<_> = owners.iter().map(|b| b.lock.lock().unwrap()).collect();
+         // Create bitmap pointers
+         let bitmap_ptrs: Vec<*const llama_cpp_sys_2::mtmd_bitmap> = bitmaps
+             .iter()
+@@ -332,9 +342,16 @@
+     }
+ }
+ 
+-impl Drop for MtmdContext {
++#[derive(Debug)]
++struct ContextOwner(NonNull<llama_cpp_sys_2::mtmd_context>);
++impl ContextOwner {
++    fn as_ptr(&self) -> *mut llama_cpp_sys_2::mtmd_context {
++        self.0.as_ptr()
++    }
++}
++impl Drop for ContextOwner {
+     fn drop(&mut self) {
+-        unsafe { llama_cpp_sys_2::mtmd_free(self.context.as_ptr()) }
++        unsafe { llama_cpp_sys_2::mtmd_free(self.as_ptr()) }
+     }
+ }
+ 
+@@ -345,7 +362,31 @@
+ /// For audio, data is stored as PCM F32 samples.
+ #[derive(Debug, Clone)]
+ pub struct MtmdBitmap {
+-    pub(crate) bitmap: NonNull<llama_cpp_sys_2::mtmd_bitmap>,
++    bitmap: Arc<BitmapOwner>,
++}
++
++#[derive(Debug)]
++struct BitmapOwner {
++    bitmap: NonNull<llama_cpp_sys_2::mtmd_bitmap>,
++    video: Option<NonNull<llama_cpp_sys_2::mtmd_helper_video>>,
++    // The decoder uses the projector context while lazily reading frames.
++    _context: Option<Arc<ContextOwner>>,
++    lock: Mutex<()>,
++}
++impl BitmapOwner {
++    fn as_ptr(&self) -> *mut llama_cpp_sys_2::mtmd_bitmap {
++        self.bitmap.as_ptr()
++    }
++}
++impl Drop for BitmapOwner {
++    fn drop(&mut self) {
++        unsafe {
++            llama_cpp_sys_2::mtmd_bitmap_free(self.bitmap.as_ptr());
++            if let Some(video) = self.video {
++                llama_cpp_sys_2::mtmd_helper_video_free(video.as_ptr());
++            }
++        }
++    }
+ }
+ 
+ // MtmdBitmap is thread safe
+@@ -353,6 +394,39 @@
+ unsafe impl Sync for MtmdBitmap {}
+ 
+ impl MtmdBitmap {
++    fn owned(
++        bitmap: NonNull<llama_cpp_sys_2::mtmd_bitmap>,
++        video: Option<NonNull<llama_cpp_sys_2::mtmd_helper_video>>,
++        context: Option<Arc<ContextOwner>>,
++    ) -> Self {
++        Self {
++            bitmap: Arc::new(BitmapOwner {
++                bitmap,
++                video,
++                _context: context,
++                lock: Mutex::new(()),
++            }),
++        }
++    }
++
++    fn from_decoded(
++        ctx: &MtmdContext,
++        decoded: llama_cpp_sys_2::mtmd_helper_bitmap_wrapper,
++    ) -> Result<Self, MtmdBitmapError> {
++        let video = NonNull::new(decoded.video_ctx);
++        let Some(bitmap) = NonNull::new(decoded.bitmap) else {
++            if let Some(video) = video {
++                unsafe { llama_cpp_sys_2::mtmd_helper_video_free(video.as_ptr()) };
++            }
++            return Err(MtmdBitmapError::NullResult);
++        };
++        Ok(Self::owned(
++            bitmap,
++            video,
++            video.map(|_| Arc::clone(&ctx.context)),
++        ))
++    }
++
+     /// Create a bitmap from image data in RGB format.
+     ///
+     /// # Arguments
+@@ -390,7 +464,7 @@
+         let bitmap = unsafe { llama_cpp_sys_2::mtmd_bitmap_init(nx, ny, data.as_ptr()) };
+ 
+         let bitmap = NonNull::new(bitmap).ok_or(MtmdBitmapError::NullResult)?;
+-        Ok(Self { bitmap })
++        Ok(Self::owned(bitmap, None, None))
+     }
+ 
+     /// Create a bitmap from audio data in PCM F32 format.
+@@ -425,7 +499,7 @@
+             unsafe { llama_cpp_sys_2::mtmd_bitmap_init_from_audio(data.len(), data.as_ptr()) };
+ 
+         let bitmap = NonNull::new(bitmap).ok_or(MtmdBitmapError::NullResult)?;
+-        Ok(Self { bitmap })
++        Ok(Self::owned(bitmap, None, None))
+     }
+ 
+     /// Create a bitmap from a file.
+@@ -457,11 +531,12 @@
+             llama_cpp_sys_2::mtmd_helper_bitmap_init_from_file(
+                 ctx.context.as_ptr(),
+                 path_cstr.as_ptr(),
++                false,
++                llama_cpp_sys_2::mtmd_helper_init_opt_default(),
+             )
+         };
+ 
+-        let bitmap = NonNull::new(bitmap).ok_or(MtmdBitmapError::NullResult)?;
+-        Ok(Self { bitmap })
++        Self::from_decoded(ctx, bitmap)
+     }
+ 
+     /// Create a bitmap from a buffer containing file data.
+@@ -492,11 +567,12 @@
+                 ctx.context.as_ptr(),
+                 data.as_ptr(),
+                 data.len(),
++                false,
++                llama_cpp_sys_2::mtmd_helper_init_opt_default(),
+             )
+         };
+ 
+-        let bitmap = NonNull::new(bitmap).ok_or(MtmdBitmapError::NullResult)?;
+-        Ok(Self { bitmap })
++        Self::from_decoded(ctx, bitmap)
+     }
+ 
+     /// Get bitmap width in pixels.
+@@ -519,6 +595,9 @@
+     pub fn data(&self) -> &[u8] {
+         let ptr = unsafe { llama_cpp_sys_2::mtmd_bitmap_get_data(self.bitmap.as_ptr()) };
+         let len = unsafe { llama_cpp_sys_2::mtmd_bitmap_get_n_bytes(self.bitmap.as_ptr()) };
++        if len == 0 || ptr.is_null() {
++            return &[];
++        }
+         unsafe { slice::from_raw_parts(ptr, len) }
+     }
+ 
+@@ -534,6 +613,7 @@
+     /// based on a hash of the bitmap data.
+     #[must_use]
+     pub fn id(&self) -> Option<String> {
++        let _guard = self.bitmap.lock.lock().unwrap();
+         let ptr = unsafe { llama_cpp_sys_2::mtmd_bitmap_get_id(self.bitmap.as_ptr()) };
+         if ptr.is_null() {
+             None
+@@ -570,16 +650,11 @@
+     /// ```
+     pub fn set_id(&self, id: &str) -> Result<(), std::ffi::NulError> {
+         let id_cstr = CString::new(id)?;
++        let _guard = self.bitmap.lock.lock().unwrap();
+         unsafe {
+             llama_cpp_sys_2::mtmd_bitmap_set_id(self.bitmap.as_ptr(), id_cstr.as_ptr());
+         }
+         Ok(())
+-    }
+-}
+-
+-impl Drop for MtmdBitmap {
+-    fn drop(&mut self) {
+-        unsafe { llama_cpp_sys_2::mtmd_bitmap_free(self.bitmap.as_ptr()) }
+     }
+ }
+ 
+--- a/src/sampling.rs
++++ b/src/sampling.rs
+@@ -476,10 +476,6 @@
+         let sampler = unsafe {
+             llama_cpp_sys_2::llama_sampler_init_dry(
+                 model.vocab_ptr(),
+-                model
+-                    .n_ctx_train()
+-                    .try_into()
+-                    .expect("n_ctx_train exceeds i32::MAX"),
+                 multiplier,
+                 base,
+                 allowed_length,
+@@ -501,6 +497,7 @@
+     #[allow(clippy::too_many_arguments)]
+     #[must_use]
+     pub fn penalties(
++        n_vocab: i32,
+         penalty_last_n: i32,
+         penalty_repeat: f32,
+         penalty_freq: f32,
+@@ -508,6 +505,7 @@
+     ) -> Self {
+         let sampler = unsafe {
+             llama_cpp_sys_2::llama_sampler_init_penalties(
++                n_vocab,
+                 penalty_last_n,
+                 penalty_repeat,
+                 penalty_freq,
+--- a/src/timing.rs
++++ b/src/timing.rs
+@@ -37,6 +37,8 @@
+                 n_p_eval,
+                 n_eval,
+                 n_reused,
++                n_reallocs_diff: 0,
++                n_reallocs_same: 0,
+             },
+         }
+     }

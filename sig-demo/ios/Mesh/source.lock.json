@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/Mesh-LLM/mesh-llm",
+  "version": "0.78.1",
+  "sourceCommit": "bc215ce5b880e21c6c3840b8574ab64f83278821",
+  "sourceURL": "https://github.com/Mesh-LLM/mesh-llm/archive/refs/tags/v0.78.1.tar.gz",
+  "sourceSHA256": "f357109751e0fb67294c8e76dfdd5d7932a79a939dda9f7780b6046079a041ad",
+  "artifactURL": "https://github.com/Mesh-LLM/mesh-llm/releases/download/v0.78.1/MeshLLMFFI.xcframework.zip",
+  "artifactSHA256": "7014d92e720065149451de25ef72602ce4fb45c8df7504acf07c18a77e8aedd8",
+  "artifactBytes": 725689894,
+  "minimumIOSVersion": "16.0",
+  "platforms": [
+    "ios-arm64",
+    "ios-arm64-simulator",
+    "ios-arm64-maccatalyst",
+    "macos-arm64"
+  ],
+  "binaryTransformation": "none",
+  "metadataPatch": {
+    "schemaVersion": 2,
+    "scope": "four framework wrapper Info.plists; XCFramework root plist unchanged",
+    "set": {
+      "CFBundleExecutable": "MeshLLMFFI",
+      "CFBundleShortVersionString": "0.78.1"
+    },
+    "preserveBundleIdentifier": true,
+    "verifyOtherPayloadBytesUnchanged": true
+  }
+}

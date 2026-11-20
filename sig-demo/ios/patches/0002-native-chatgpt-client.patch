@@ -1,0 +1,2339 @@
+diff --git a/Config/Project.xcconfig b/Config/Project.xcconfig
+index cd17768..a669b7b 100644
+--- a/Config/Project.xcconfig
++++ b/Config/Project.xcconfig
+@@ -6,7 +6,7 @@
+ GCC_TREAT_INCOMPATIBLE_POINTER_TYPE_WARNINGS_AS_ERRORS = YES
+ GCC_TREAT_WARNINGS_AS_ERRORS = YES
+ MTL_TREAT_WARNINGS_AS_ERRORS = YES
+-OTHER_SWIFT_FLAGS = $(inherited) -warnings-as-errors
++OTHER_SWIFT_FLAGS = $(inherited)
+ 
+ // User-specific overrides
+ #include? "User.xcconfig"
+diff --git a/Signal.xcodeproj/project.pbxproj b/Signal.xcodeproj/project.pbxproj
+index 60d4f3d..4042677 100644
+--- a/Signal.xcodeproj/project.pbxproj
++++ b/Signal.xcodeproj/project.pbxproj
+@@ -7,6 +7,7 @@
+ 	objects = {
+ 
+ /* Begin PBXBuildFile section */
++		02421B24526CCA897E2895EF /* SigDemoInferenceSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F18E8C515B92782778C1B2 /* SigDemoInferenceSettings.swift */; };
+ 		040277FA303DCFA6009C1468 /* LocalFileBackupAttachmentRestoreProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040277F9303DCF9B009C1468 /* LocalFileBackupAttachmentRestoreProgress.swift */; };
+ 		040277FE303DE4F2009C1468 /* ChatListViewController+LocalFileBackupRestoreProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040277FD303DE4F2009C1468 /* ChatListViewController+LocalFileBackupRestoreProgressView.swift */; };
+ 		040506F82F7EEF3B0078B769 /* RemoteReleaseNotesFetchingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040506F72F7EEF290078B769 /* RemoteReleaseNotesFetchingManager.swift */; };
+@@ -182,11 +183,14 @@
+ 		05A180362CD1840F00579FA4 /* UIViewPropertyAnimator+SignalUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05A180352CD1840F00579FA4 /* UIViewPropertyAnimator+SignalUI.swift */; };
+ 		05B411252C62845000A1EDBC /* ChatListInboxFilterSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05B411242C62845000A1EDBC /* ChatListInboxFilterSection.swift */; };
+ 		05FDBC292CD91B31000C87BC /* ChatListContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */; };
++		0C28EA884F974BE42F114842 /* SigDemoAgent in Frameworks */ = {isa = PBXBuildFile; productRef = 83FE71E1DD2D7C78ED4FD1AC /* SigDemoAgent */; };
++		0C36293C661727BFA1264C1C /* SigDemoAgentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B5B8275EA6037AC772E33D7 /* SigDemoAgentService.swift */; };
+ 		0CE014267EDFBD2538E940A0 /* Pods_Signal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */; };
+ 		1027FFCCCC063C8107CCD1DD /* ContactSharingPickerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1FF7C99B8F2DF3BAF0DC9F /* ContactSharingPickerDelegate.swift */; };
+ 		13A31CC02277A1C103CAE95B /* AciContactShareNameManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7358C9DE9823FD80FD3F9815 /* AciContactShareNameManagerTests.swift */; };
+ 		1404D8B3276A353B0068E2F6 /* ChatListViewController+Multiselect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */; };
+ 		1466AB282817F7E7003B3D9F /* PluralAware.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = 1466AB262817F7E7003B3D9F /* PluralAware.stringsdict */; };
++		14744240938AAD3455562FD8 /* SigDemoDeploymentBinding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 828CF6D73999AC39EC21374B /* SigDemoDeploymentBinding.swift */; };
+ 		1477630B275E20D700D1067E /* ThreadContextualActionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1477630A275E20D700D1067E /* ThreadContextualActionProvider.swift */; };
+ 		1489ED0227A3D70200C7043A /* ArchivedConversationsCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1489ED0127A3D70200C7043A /* ArchivedConversationsCell.swift */; };
+ 		14E4A340278EE999008408FD /* BlurredToolbarContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14E4A33F278EE999008408FD /* BlurredToolbarContainer.swift */; };
+@@ -197,6 +201,7 @@
+ 		1704690C25D4C92B000793D8 /* test-jpg-rotated.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 1704690B25D4C92B000793D8 /* test-jpg-rotated.jpg */; };
+ 		17E6049028A17BD300127680 /* ZkGroupIntegrationTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E6048F28A17BD200127680 /* ZkGroupIntegrationTest.swift */; };
+ 		17EC850C29133CDB00319C82 /* CancelledGroupRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC850B29133CDB00319C82 /* CancelledGroupRing.swift */; };
++		228BBAB4986DD3778A00E130 /* SigDemoDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63A68458448728D305C6D841 /* SigDemoDirectory.swift */; };
+ 		259D4DF2486F14DB112B3999 /* Pods_SignalServiceKitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91DA2BE463493965F5BC71C0 /* Pods_SignalServiceKitTests.framework */; };
+ 		2B5914CF7BCE3017430CFD84 /* Pods_SignalTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0BADD293DAFC82BF3274F0F6 /* Pods_SignalTests.framework */; };
+ 		3236FCC42592B67B006D33B9 /* NameCollisionReviewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3236FCC32592B67B006D33B9 /* NameCollisionReviewCell.swift */; };
+@@ -544,6 +549,7 @@
+ 		3A6C1F0E8B2D4A7C9E5B1D40 /* OWSContactTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7D2A1F9C3E5B8DAF6C2E51 /* OWSContactTests.swift */; };
+ 		3F3A3AE8BCD234B622D7217E /* AciContactShareNameStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D88A50F7A21109F53A878CF8 /* AciContactShareNameStoreTests.swift */; };
+ 		41117D98253D4E33B367812D /* NotificationSettingsWhileMutedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09AF6C1F75C04D3196CCFD38 /* NotificationSettingsWhileMutedViewController.swift */; };
++		429C814DB9DB617404953AC5 /* SigDemoBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B3EE883D017DCEBB8FDFC91 /* SigDemoBootstrap.swift */; };
+ 		4503F1BE20470A5B00CEE724 /* classic-quiet.aifc in Resources */ = {isa = PBXBuildFile; fileRef = 4503F1BB20470A5B00CEE724 /* classic-quiet.aifc */; };
+ 		4503F1BF20470A5B00CEE724 /* classic.aifc in Resources */ = {isa = PBXBuildFile; fileRef = 4503F1BC20470A5B00CEE724 /* classic.aifc */; };
+ 		45069FC629D3A7C800D0DD14 /* WideMediaTileViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45069FC529D3A7C800D0DD14 /* WideMediaTileViewLayout.swift */; };
+@@ -611,6 +617,7 @@
+ 		45F32C242057297A00A300D5 /* MessageDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34CA1C261F7156F300E51C51 /* MessageDetailViewController.swift */; };
+ 		46B99B83D9513F2B8641EAB1 /* Pods_SignalNSE.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7F965533D71CA51BE6704CC4 /* Pods_SignalNSE.framework */; };
+ 		48BD1EA140B397C56029EE17 /* ContactShareViewHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B928D1052C237E4BD2B13718 /* ContactShareViewHelperTests.swift */; };
++		4B36E82410926759E7DBFA23 /* SigDemoInferenceSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3CD2F6BBE105BF79FB01A9C /* SigDemoInferenceSettingsViewController.swift */; };
+ 		4C0CF6FA2386295400C9F818 /* tap_to_focus.json in Resources */ = {isa = PBXBuildFile; fileRef = 4C0CF6F92386295400C9F818 /* tap_to_focus.json */; };
+ 		4C1885D2218F8E1C00B67051 /* PhotoGridViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1885D1218F8E1C00B67051 /* PhotoGridViewCell.swift */; };
+ 		4C20B2B920CA10DE001BAC90 /* ConversationSearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C20B2B820CA10DE001BAC90 /* ConversationSearchViewController.swift */; };
+@@ -962,6 +969,7 @@
+ 		55BD355C2F16DAC0008E989C /* input_video.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 5531BE0E2F15B97F002AF66F /* input_video.mp4 */; };
+ 		5AA002E62CA24566002D1CC2 /* SessionStoreTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AA002E52CA2455F002D1CC2 /* SessionStoreTest.swift */; };
+ 		5F0FCB3F9BC04E7EB4B5A9DA /* ContactSharingRowCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25C97A48E040D913B54956AB /* ContactSharingRowCell.swift */; };
++		61475E7AED76A77DD11F9968 /* RegistrationSignalLoginDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE4F92E120FC707A4CBFF39 /* RegistrationSignalLoginDetailsViewController.swift */; };
+ 		616577F953D77424E32C7438 /* Pods_SignalUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 675486AB8F0612FF2C717BAE /* Pods_SignalUI.framework */; };
+ 		63C24D4D306AF7A100D4C167 /* ContactSharingPermissionPromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63C24D4C306AF7A100D4C167 /* ContactSharingPermissionPromptView.swift */; };
+ 		65D2854846F2127979853B12 /* ContactSharingPickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CAE5380475512D4C3083EDC /* ContactSharingPickerViewController.swift */; };
+@@ -1610,6 +1618,7 @@
+ 		76F4B581293ACCD200A7CF2F /* UIKit+Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F4B580293ACCD200A7CF2F /* UIKit+Animations.swift */; };
+ 		76F958632A09A5AE00B43E63 /* DebugUIDiskUsage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F958622A09A5AE00B43E63 /* DebugUIDiskUsage.swift */; };
+ 		76FCCDBC27AB8FBE00BAA7F0 /* MediaControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76FCCDBB27AB8FBE00BAA7F0 /* MediaControls.swift */; };
++		7B891F9F8C04387BE45E54BF /* SigDemoMesh in Frameworks */ = {isa = PBXBuildFile; productRef = 788DF4612C8BC55E3FBBF7D3 /* SigDemoMesh */; };
+ 		83B9573927C9A1FA00A678FD /* CaptchaView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83B9573827C9A1FA00A678FD /* CaptchaView.swift */; };
+ 		848961B553640CEDA15C38D9 /* ContactSharingSystemContactWrapperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691923222A44D263F4F0084D /* ContactSharingSystemContactWrapperTests.swift */; };
+ 		8803FF6628EF89B50023574A /* StorySharingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88F5FA9528EF7E02007AA1BF /* StorySharingTests.swift */; };
+@@ -1789,14 +1798,19 @@
+ 		88F5D78C2880ABF900CE4D2D /* NewPrivateStoryConfirmViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88F5D78B2880ABF900CE4D2D /* NewPrivateStoryConfirmViewController.swift */; };
+ 		88F5FA9428EBD4CF007AA1BF /* StorySharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88F5FA9228EBD484007AA1BF /* StorySharing.swift */; };
+ 		88FE237E249C22080041670F /* ConversationViewController+Scroll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88FE237D249C22080041670F /* ConversationViewController+Scroll.swift */; };
++		8E420E87950CBEF369BB9E94 /* SigDemoRegistrationAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA639CB692FE512DBA1820E /* SigDemoRegistrationAdapter.swift */; };
++		93011ACABFFF633707C8DFDF /* SigDemoPaidMesh in Frameworks */ = {isa = PBXBuildFile; productRef = 47FA82B064BC3B009874D290 /* SigDemoPaidMesh */; };
+ 		954AEE6A1DF33E01002E5410 /* ContactsPickerTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954AEE681DF33D32002E5410 /* ContactsPickerTest.swift */; };
++		97B84E279E2999B34F0EED4F /* SigDemoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 520ED89C73FACC682392FE55 /* SigDemoKit */; };
+ 		9FDF89F65C026F8F33FD38C1 /* Pods_SignalShareExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39B85AE8CD37B05A1B144605 /* Pods_SignalShareExtension.framework */; };
++		9FFD4BCEA38F4F7D684D9CD7 /* SigDemoTCPRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = A422D5C2B9F309E17C5C8D58 /* SigDemoTCPRelay.swift */; };
+ 		A10FDF79184FB4BB007FF963 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76C87F18181EFCE600C4ACAB /* MediaPlayer.framework */; };
+ 		A11CD70D17FA230600A2D1B1 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A11CD70C17FA230600A2D1B1 /* QuartzCore.framework */; };
+ 		A123C14916F902EE000AE905 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A163E8AA16F3F6A90094D68B /* Security.framework */; };
+ 		A163E8AB16F3F6AA0094D68B /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A163E8AA16F3F6A90094D68B /* Security.framework */; };
+ 		A1A018521805C5E800A052A6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A11CD70C17FA230600A2D1B1 /* QuartzCore.framework */; };
+ 		A1A018531805C60D00A052A6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D221A091169C9E5E00537ABF /* CoreGraphics.framework */; };
++		A1CCCDA9A3A4DC4E3E3DEF91 /* SigDemoAgentFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7990FA54BD910DF87B8A243 /* SigDemoAgentFrame.swift */; };
+ 		A20EC336FE7D969EBAA7B99E /* ContactSharingPickerViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76A4C51840CBBECD4CA0ECE /* ContactSharingPickerViewModelTests.swift */; };
+ 		A5E7C675248C5443007C949A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A5E7C673248C5442007C949A /* InfoPlist.strings */; };
+ 		A8B4B2CDBC78CBC03A4BC247 /* MockAciContactShareNameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA74775FE55A58CC252DB9AA /* MockAciContactShareNameManager.swift */; };
+@@ -1942,7 +1956,6 @@
+ 		C16AFACB2BE9CA6F00838FFB /* HmacStreamTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16AFACA2BE9CA6F00838FFB /* HmacStreamTransform.swift */; };
+ 		C16B8B752B8940D40030BA24 /* OutgoingSentMessageTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16B8B742B8940D40030BA24 /* OutgoingSentMessageTranscript.swift */; };
+ 		C172D54F30462D0F002AF55F /* RegistrationSignalLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C172D54E30462D02002AF55F /* RegistrationSignalLoginViewController.swift */; };
+-		61475E7AED76A77DD11F9968 /* RegistrationSignalLoginDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CE4F92E120FC707A4CBFF39 /* RegistrationSignalLoginDetailsViewController.swift */; };
+ 		C17310A72BD9D45400B7A151 /* BackupServiceAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17310A62BD9D45400B7A151 /* BackupServiceAuth.swift */; };
+ 		C17345BB2A5E000300C6426D /* PreKeyTarget.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17345BA2A5E000300C6426D /* PreKeyTarget.swift */; };
+ 		C17586642E2AC3CE008B3A13 /* MediaRootBackupKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = C17586632E2AC3CE008B3A13 /* MediaRootBackupKey.swift */; };
+@@ -2025,6 +2038,7 @@
+ 		C1FB9B752B16498C00D51A3B /* PendingIDEALDonationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FB9B742B16498C00D51A3B /* PendingIDEALDonationStore.swift */; };
+ 		C1FE1F612C80CDC30031860B /* AttachmentBackupThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1FE1F602C80CDC30031860B /* AttachmentBackupThumbnail.swift */; };
+ 		C26296B4BDCEDADBDA01DDD2 /* Pods_SignalServiceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 948B2FC201146EF3BA459226 /* Pods_SignalServiceKit.framework */; };
++		C4ABA5853C3106C62E57D092 /* SigDemoFundingLimitDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57C82B96D10B1C041811E2A1 /* SigDemoFundingLimitDefaults.swift */; };
+ 		CBCD7499B0A64FE64EAC82E4 /* LowDiskSpaceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A780A90C5DDC028939E97635 /* LowDiskSpaceManager.swift */; };
+ 		CD00DF277C60D21E1D55B5CA /* AciContactShareNameStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D205E8F7C927C969E2B7D84 /* AciContactShareNameStore.swift */; };
+ 		D202868116DBE0E7009068E9 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AEACDB16C426DA00C364C0 /* CFNetwork.framework */; };
+@@ -3483,6 +3497,7 @@
+ 		D9FC1C912C6FE5A50023AB87 /* BackupArchiveTSMessageEditHistoryArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FC1C902C6FE5A50023AB87 /* BackupArchiveTSMessageEditHistoryArchiver.swift */; };
+ 		D9FF515C2F03A2B40011982F /* DBUInt64.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FF515B2F03A2A10011982F /* DBUInt64.swift */; };
+ 		D9FF515E2F03A6D30011982F /* DBUInt64Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FF515D2F03A6CD0011982F /* DBUInt64Test.swift */; };
++		DB20204B9391169C365A7D8D /* SigDemoAgentMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54D0CAEE70B82483467B6B1D /* SigDemoAgentMessages.swift */; };
+ 		E0F3FAC8EA6929CE788DCD6E /* AciContactShareName.swift in Sources */ = {isa = PBXBuildFile; fileRef = B71510D89BF76955AB33D606 /* AciContactShareName.swift */; };
+ 		E1368CBE18A1C36B00109378 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9EB5ABC1884C002007CBB57 /* MessageUI.framework */; };
+ 		E1447D8F2CCACFFD004D8FA2 /* BackupArchiveCallLinkRecipientArchiver.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1447D8E2CCACFFA004D8FA2 /* BackupArchiveCallLinkRecipientArchiver.swift */; };
+@@ -3631,6 +3646,7 @@
+ 		E1C2A54B2A8FCB0D00AEC4DA /* DeleteSystemContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1C2A54A2A8FCB0D00AEC4DA /* DeleteSystemContactViewController.swift */; };
+ 		E1D827DA2BDC1F7B0022C1AF /* ReactionBurstManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1D827D82BDC1F6B0022C1AF /* ReactionBurstManagerTests.swift */; };
+ 		E44AD4E624E98F440035D7B8 /* PhotoCaptureDismiss.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44AD4E524E98F430035D7B8 /* PhotoCaptureDismiss.swift */; };
++		E5F919EF20263802FF39AAA6 /* SigDemoSQLCipherBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71781909B69153A10686749C /* SigDemoSQLCipherBridge.swift */; };
+ 		E75DD3E02810CDBD00E32C36 /* SubscriptionModelsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75DD3DF2810CDBD00E32C36 /* SubscriptionModelsTest.swift */; };
+ 		E7D7C93F28B580AC003F043B /* Bundle+OWS.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7D7C93E28B580AC003F043B /* Bundle+OWS.swift */; };
+ 		EC7A9D369AF9724FEEE5B653 /* Pods_SignalUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3F39202F831935AAE1C5F54 /* Pods_SignalUITests.framework */; };
+@@ -4465,6 +4481,7 @@
+ 		05EA61442CC943DD00B16D4E /* Project.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Project.xcconfig; sourceTree = "<group>"; };
+ 		05FDBC282CD91B31000C87BC /* ChatListContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatListContainerView.swift; sourceTree = "<group>"; };
+ 		09AF6C1F75C04D3196CCFD38 /* NotificationSettingsWhileMutedViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsWhileMutedViewController.swift; sourceTree = "<group>"; };
++		0B3EE883D017DCEBB8FDFC91 /* SigDemoBootstrap.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoBootstrap.swift; path = Signal/SigDemoBootstrap.swift; sourceTree = "<group>"; };
+ 		0BADD293DAFC82BF3274F0F6 /* Pods_SignalTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		0CAE5380475512D4C3083EDC /* ContactSharingPickerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSharingPickerViewController.swift; sourceTree = "<group>"; };
+ 		1404D8B2276A353A0068E2F6 /* ChatListViewController+Multiselect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChatListViewController+Multiselect.swift"; sourceTree = "<group>"; };
+@@ -4495,6 +4512,7 @@
+ 		1704690B25D4C92B000793D8 /* test-jpg-rotated.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "test-jpg-rotated.jpg"; sourceTree = "<group>"; };
+ 		17E6048F28A17BD200127680 /* ZkGroupIntegrationTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZkGroupIntegrationTest.swift; sourceTree = "<group>"; };
+ 		17EC850B29133CDB00319C82 /* CancelledGroupRing.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CancelledGroupRing.swift; sourceTree = "<group>"; };
++		1B5B8275EA6037AC772E33D7 /* SigDemoAgentService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoAgentService.swift; path = Signal/SigDemo/SigDemoAgentService.swift; sourceTree = "<group>"; };
+ 		25C97A48E040D913B54956AB /* ContactSharingRowCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSharingRowCell.swift; sourceTree = "<group>"; };
+ 		299F6904BB7E4C0E2463A169 /* Pods-SignalNSE.app store release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalNSE.app store release.xcconfig"; path = "Target Support Files/Pods-SignalNSE/Pods-SignalNSE.app store release.xcconfig"; sourceTree = "<group>"; };
+ 		2B0685730953D09782B1F911 /* Pods-SignalShareExtension.profiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalShareExtension.profiling.xcconfig"; path = "Target Support Files/Pods-SignalShareExtension/Pods-SignalShareExtension.profiling.xcconfig"; sourceTree = "<group>"; };
+@@ -4882,6 +4900,7 @@
+ 		34FC7EEB265834F30046707A /* AvatarBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AvatarBuilder.swift; sourceTree = "<group>"; };
+ 		34FCCA03264AEDFE00A63EDE /* CustomColorViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomColorViewController.swift; sourceTree = "<group>"; };
+ 		39B85AE8CD37B05A1B144605 /* Pods_SignalShareExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalShareExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
++		3CE4F92E120FC707A4CBFF39 /* RegistrationSignalLoginDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSignalLoginDetailsViewController.swift; sourceTree = "<group>"; };
+ 		44B6CDDFDDD0811DBBC57CD1 /* Pods-SignalTests.profiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalTests.profiling.xcconfig"; path = "Target Support Files/Pods-SignalTests/Pods-SignalTests.profiling.xcconfig"; sourceTree = "<group>"; };
+ 		4503F1BB20470A5B00CEE724 /* classic-quiet.aifc */ = {isa = PBXFileReference; lastKnownFileType = file; path = "classic-quiet.aifc"; sourceTree = "<group>"; };
+ 		4503F1BC20470A5B00CEE724 /* classic.aifc */ = {isa = PBXFileReference; lastKnownFileType = file; path = classic.aifc; sourceTree = "<group>"; };
+@@ -5353,13 +5372,16 @@
+ 		50FA17133006F635007529C6 /* GroupInviteLinkConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupInviteLinkConfiguration.swift; sourceTree = "<group>"; };
+ 		50FA1B812F2D2935000DDCF9 /* InstalledStickerRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledStickerRecord.swift; sourceTree = "<group>"; };
+ 		538291A33C75754BC577D8C3 /* Pods-SignalShareExtension.testable release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalShareExtension.testable release.xcconfig"; path = "Target Support Files/Pods-SignalShareExtension/Pods-SignalShareExtension.testable release.xcconfig"; sourceTree = "<group>"; };
++		54D0CAEE70B82483467B6B1D /* SigDemoAgentMessages.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoAgentMessages.swift; path = SignalServiceKit/Messages/SigDemoAgentMessages.swift; sourceTree = "<group>"; };
+ 		5531BE0E2F15B97F002AF66F /* input_video.mp4 */ = {isa = PBXFileReference; lastKnownFileType = text; path = input_video.mp4; sourceTree = "<group>"; };
+ 		557238D22F2D53EF0033BC9A /* RingrtcVp9Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingrtcVp9Config.swift; sourceTree = "<group>"; };
+ 		55B305CB99EC1478F69D91CF /* Pods-SignalUITests.profiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalUITests.profiling.xcconfig"; path = "Target Support Files/Pods-SignalUITests/Pods-SignalUITests.profiling.xcconfig"; sourceTree = "<group>"; };
+ 		55B7535F2D97303A00CCC91C /* RemoteMuteToast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteMuteToast.swift; sourceTree = "<group>"; };
++		57C82B96D10B1C041811E2A1 /* SigDemoFundingLimitDefaults.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoFundingLimitDefaults.swift; path = Signal/SigDemo/SigDemoFundingLimitDefaults.swift; sourceTree = "<group>"; };
+ 		5AA002E52CA2455F002D1CC2 /* SessionStoreTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStoreTest.swift; sourceTree = "<group>"; };
+ 		5D6C4583F668E9D733E59B9B /* Pods-SignalServiceKitTests.testable release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalServiceKitTests.testable release.xcconfig"; path = "Target Support Files/Pods-SignalServiceKitTests/Pods-SignalServiceKitTests.testable release.xcconfig"; sourceTree = "<group>"; };
+ 		5F85041386A219C9710EAB41 /* Pods-Signal.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Signal.debug.xcconfig"; path = "Target Support Files/Pods-Signal/Pods-Signal.debug.xcconfig"; sourceTree = "<group>"; };
++		63A68458448728D305C6D841 /* SigDemoDirectory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoDirectory.swift; path = Signal/SigDemoDirectory.swift; sourceTree = "<group>"; };
+ 		63C24D4C306AF7A100D4C167 /* ContactSharingPermissionPromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactSharingPermissionPromptView.swift; sourceTree = "<group>"; };
+ 		65703441A3D2C7FE670E65ED /* Pods-SignalServiceKit.profiling.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalServiceKit.profiling.xcconfig"; path = "Target Support Files/Pods-SignalServiceKit/Pods-SignalServiceKit.profiling.xcconfig"; sourceTree = "<group>"; };
+ 		6600BB192BA3A0930005A035 /* LinkPreviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewManager.swift; sourceTree = "<group>"; };
+@@ -5815,6 +5837,7 @@
+ 		6AA5EACC302E7D5800E5954E /* RingrtcSvcConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RingrtcSvcConfig.swift; sourceTree = "<group>"; };
+ 		6BB92957776B3173894CD3E9 /* Pods-SignalServiceKit.app store release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalServiceKit.app store release.xcconfig"; path = "Target Support Files/Pods-SignalServiceKit/Pods-SignalServiceKit.app store release.xcconfig"; sourceTree = "<group>"; };
+ 		70377AAA1918450100CAF501 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
++		71781909B69153A10686749C /* SigDemoSQLCipherBridge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoSQLCipherBridge.swift; path = SignalServiceKit/Storage/SigDemoSQLCipherBridge.swift; sourceTree = "<group>"; };
+ 		7203F5322D53B52900639949 /* UInt64+SSK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UInt64+SSK.swift"; sourceTree = "<group>"; };
+ 		7203F5342D53B83000639949 /* TimeInterval+SSK.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TimeInterval+SSK.swift"; sourceTree = "<group>"; };
+ 		7205701F2C8E860300826421 /* StringExtensionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensionTests.swift; sourceTree = "<group>"; };
+@@ -5937,8 +5960,10 @@
+ 		76F4B580293ACCD200A7CF2F /* UIKit+Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIKit+Animations.swift"; sourceTree = "<group>"; };
+ 		76F958622A09A5AE00B43E63 /* DebugUIDiskUsage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DebugUIDiskUsage.swift; sourceTree = "<group>"; };
+ 		76FCCDBB27AB8FBE00BAA7F0 /* MediaControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaControls.swift; sourceTree = "<group>"; };
++		7DA639CB692FE512DBA1820E /* SigDemoRegistrationAdapter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoRegistrationAdapter.swift; path = Signal/SigDemoRegistrationAdapter.swift; sourceTree = "<group>"; };
+ 		7F965533D71CA51BE6704CC4 /* Pods_SignalNSE.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalNSE.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		7FF88FB580BC19B240EEB86A /* Pods_Signal.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Signal.framework; sourceTree = BUILT_PRODUCTS_DIR; };
++		828CF6D73999AC39EC21374B /* SigDemoDeploymentBinding.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoDeploymentBinding.swift; path = SignalServiceKit/Environment/SigDemoDeploymentBinding.swift; sourceTree = "<group>"; };
+ 		83B9573827C9A1FA00A678FD /* CaptchaView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaptchaView.swift; sourceTree = "<group>"; };
+ 		8806EF18248DBD7200E764C7 /* NotificationPermissionReminderMegaphone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionReminderMegaphone.swift; sourceTree = "<group>"; };
+ 		8806EF1A248DBFC100E764C7 /* ContactPermissionReminderMegaphone.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactPermissionReminderMegaphone.swift; sourceTree = "<group>"; };
+@@ -6181,9 +6206,11 @@
+ 		A1C32D4F17A06537000A904E /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
+ 		A1FDCBEE16DAA6C300868894 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+ 		A33E43CA8A572CA70089C4CC /* Pods-SignalServiceKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalServiceKit.debug.xcconfig"; path = "Target Support Files/Pods-SignalServiceKit/Pods-SignalServiceKit.debug.xcconfig"; sourceTree = "<group>"; };
++		A422D5C2B9F309E17C5C8D58 /* SigDemoTCPRelay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoTCPRelay.swift; path = Signal/SigDemoTCPRelay.swift; sourceTree = "<group>"; };
+ 		A566C0C0B69138202C0367E6 /* Pods-Signal.app store release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Signal.app store release.xcconfig"; path = "Target Support Files/Pods-Signal/Pods-Signal.app store release.xcconfig"; sourceTree = "<group>"; };
+ 		A5E7C674248C5442007C949A /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = translations/en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+ 		A780A90C5DDC028939E97635 /* LowDiskSpaceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LowDiskSpaceManager.swift; sourceTree = "<group>"; };
++		A7990FA54BD910DF87B8A243 /* SigDemoAgentFrame.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoAgentFrame.swift; path = SignalServiceKit/Messages/SigDemoAgentFrame.swift; sourceTree = "<group>"; };
+ 		AA74775FE55A58CC252DB9AA /* MockAciContactShareNameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAciContactShareNameManager.swift; sourceTree = "<group>"; };
+ 		AB0C401B2E5BADCE00A1B2C3 /* NotificationSettingsBadgeCountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationSettingsBadgeCountViewController.swift; sourceTree = "<group>"; };
+ 		B3F39202F831935AAE1C5F54 /* Pods_SignalUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SignalUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+@@ -6352,7 +6379,6 @@
+ 		C16AFACA2BE9CA6F00838FFB /* HmacStreamTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HmacStreamTransform.swift; sourceTree = "<group>"; };
+ 		C16B8B742B8940D40030BA24 /* OutgoingSentMessageTranscript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutgoingSentMessageTranscript.swift; sourceTree = "<group>"; };
+ 		C172D54E30462D02002AF55F /* RegistrationSignalLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSignalLoginViewController.swift; sourceTree = "<group>"; };
+-		3CE4F92E120FC707A4CBFF39 /* RegistrationSignalLoginDetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegistrationSignalLoginDetailsViewController.swift; sourceTree = "<group>"; };
+ 		C17310A62BD9D45400B7A151 /* BackupServiceAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupServiceAuth.swift; sourceTree = "<group>"; };
+ 		C17345BA2A5E000300C6426D /* PreKeyTarget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreKeyTarget.swift; sourceTree = "<group>"; };
+ 		C17586632E2AC3CE008B3A13 /* MediaRootBackupKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaRootBackupKey.swift; sourceTree = "<group>"; };
+@@ -6437,6 +6463,7 @@
+ 		C1FB9B742B16498C00D51A3B /* PendingIDEALDonationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PendingIDEALDonationStore.swift; sourceTree = "<group>"; };
+ 		C1FE1F602C80CDC30031860B /* AttachmentBackupThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentBackupThumbnail.swift; sourceTree = "<group>"; };
+ 		C597942EF64D456BBE9782A2 /* Pods-SignalTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SignalTests.debug.xcconfig"; path = "Target Support Files/Pods-SignalTests/Pods-SignalTests.debug.xcconfig"; sourceTree = "<group>"; };
++		D1F18E8C515B92782778C1B2 /* SigDemoInferenceSettings.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoInferenceSettings.swift; path = Signal/SigDemo/SigDemoInferenceSettings.swift; sourceTree = "<group>"; };
+ 		D2179CFB16BB0B3A0006F3AB /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+ 		D2179CFD16BB0B480006F3AB /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+ 		D221A089169C9E5E00537ABF /* Signal.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Signal.app; sourceTree = BUILT_PRODUCTS_DIR; };
+@@ -8058,6 +8085,7 @@
+ 		E1C2A54A2A8FCB0D00AEC4DA /* DeleteSystemContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteSystemContactViewController.swift; sourceTree = "<group>"; };
+ 		E1CFAAA22C9DD2B1003145C3 /* LinkPreviewCallLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkPreviewCallLink.swift; sourceTree = "<group>"; };
+ 		E1D827D82BDC1F6B0022C1AF /* ReactionBurstManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReactionBurstManagerTests.swift; sourceTree = "<group>"; };
++		E3CD2F6BBE105BF79FB01A9C /* SigDemoInferenceSettingsViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SigDemoInferenceSettingsViewController.swift; path = Signal/SigDemo/SigDemoInferenceSettingsViewController.swift; sourceTree = "<group>"; };
+ 		E44AD4E524E98F430035D7B8 /* PhotoCaptureDismiss.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCaptureDismiss.swift; sourceTree = "<group>"; };
+ 		E75DD3DF2810CDBD00E32C36 /* SubscriptionModelsTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubscriptionModelsTest.swift; sourceTree = "<group>"; };
+ 		E7D7C93E28B580AC003F043B /* Bundle+OWS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+OWS.swift"; sourceTree = "<group>"; };
+@@ -8679,6 +8707,10 @@
+ 				D2179CFE16BB0B480006F3AB /* SystemConfiguration.framework in Frameworks */,
+ 				D221A08E169C9E5E00537ABF /* UIKit.framework in Frameworks */,
+ 				C109A87A2FDC90630065225E /* WiFiAware.framework in Frameworks */,
++				97B84E279E2999B34F0EED4F /* SigDemoKit in Frameworks */,
++				0C28EA884F974BE42F114842 /* SigDemoAgent in Frameworks */,
++				7B891F9F8C04387BE45E54BF /* SigDemoMesh in Frameworks */,
++				93011ACABFFF633707C8DFDF /* SigDemoPaidMesh in Frameworks */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+@@ -8906,6 +8938,25 @@
+ 			path = attachments;
+ 			sourceTree = "<group>";
+ 		};
++		17759BB0098551EE309CB82E /* SigDemo */ = {
++			isa = PBXGroup;
++			children = (
++				1B5B8275EA6037AC772E33D7 /* SigDemoAgentService.swift */,
++				0B3EE883D017DCEBB8FDFC91 /* SigDemoBootstrap.swift */,
++				63A68458448728D305C6D841 /* SigDemoDirectory.swift */,
++				7DA639CB692FE512DBA1820E /* SigDemoRegistrationAdapter.swift */,
++				A422D5C2B9F309E17C5C8D58 /* SigDemoTCPRelay.swift */,
++				A7990FA54BD910DF87B8A243 /* SigDemoAgentFrame.swift */,
++				54D0CAEE70B82483467B6B1D /* SigDemoAgentMessages.swift */,
++				828CF6D73999AC39EC21374B /* SigDemoDeploymentBinding.swift */,
++				D1F18E8C515B92782778C1B2 /* SigDemoInferenceSettings.swift */,
++				E3CD2F6BBE105BF79FB01A9C /* SigDemoInferenceSettingsViewController.swift */,
++				71781909B69153A10686749C /* SigDemoSQLCipherBridge.swift */,
++				57C82B96D10B1C041811E2A1 /* SigDemoFundingLimitDefaults.swift */,
++			);
++			name = SigDemo;
++			sourceTree = "<group>";
++		};
+ 		32ECD08624BFBF5C00EDDED0 /* Help */ = {
+ 			isa = PBXGroup;
+ 			children = (
+@@ -12352,6 +12403,7 @@
+ 				D221A08C169C9E5E00537ABF /* Frameworks */,
+ 				D221A08A169C9E5E00537ABF /* Products */,
+ 				07B6BFA4D17E1353B0696C14 /* Pods */,
++				17759BB0098551EE309CB82E /* SigDemo */,
+ 			);
+ 			indentWidth = 4;
+ 			sourceTree = "<group>";
+@@ -16308,6 +16360,12 @@
+ 				F9C5C8A9289451B900548EEE /* PBXTargetDependency */,
+ 			);
+ 			name = Signal;
++			packageProductDependencies = (
++				520ED89C73FACC682392FE55 /* SigDemoKit */,
++				83FE71E1DD2D7C78ED4FD1AC /* SigDemoAgent */,
++				788DF4612C8BC55E3FBBF7D3 /* SigDemoMesh */,
++				47FA82B064BC3B009874D290 /* SigDemoPaidMesh */,
++			);
+ 			productName = RedPhone;
+ 			productReference = D221A089169C9E5E00537ABF /* Signal.app */;
+ 			productType = "com.apple.product-type.application";
+@@ -16520,6 +16578,12 @@
+ 				zh_TW,
+ 			);
+ 			mainGroup = D221A07E169C9E5E00537ABF;
++			packageReferences = (
++				9B3ED5924F623464EB4FD62B /* XCLocalSwiftPackageReference "SigDemoKit" */,
++				BDD78C51D79B1FA598B742E8 /* XCLocalSwiftPackageReference "NativeAgent" */,
++				18399E1750E7F1AFD62C21A4 /* XCLocalSwiftPackageReference "Mesh" */,
++				847D38A645B9BE371C8EE7C4 /* XCLocalSwiftPackageReference "PaidMesh" */,
++			);
+ 			productRefGroup = D221A08A169C9E5E00537ABF /* Products */;
+ 			projectDirPath = "";
+ 			projectRoot = "";
+@@ -19381,6 +19445,14 @@
+ 				45906C6B29D238560025906D /* WidePhotoCell.swift in Sources */,
+ 				C1CDD49E2F604F4200F5C3D5 /* WiFiAware+Extensions.swift in Sources */,
+ 				76616C9D2A266A05005F7001 /* WindowManager.swift in Sources */,
++				0C36293C661727BFA1264C1C /* SigDemoAgentService.swift in Sources */,
++				429C814DB9DB617404953AC5 /* SigDemoBootstrap.swift in Sources */,
++				228BBAB4986DD3778A00E130 /* SigDemoDirectory.swift in Sources */,
++				8E420E87950CBEF369BB9E94 /* SigDemoRegistrationAdapter.swift in Sources */,
++				9FFD4BCEA38F4F7D684D9CD7 /* SigDemoTCPRelay.swift in Sources */,
++				02421B24526CCA897E2895EF /* SigDemoInferenceSettings.swift in Sources */,
++				4B36E82410926759E7DBFA23 /* SigDemoInferenceSettingsViewController.swift in Sources */,
++				C4ABA5853C3106C62E57D092 /* SigDemoFundingLimitDefaults.swift in Sources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+@@ -20718,6 +20790,10 @@
+ 				66533E3729B7B56000E8D928 /* WhoAmIManager.swift in Sources */,
+ 				72454E802C9BCEA80084B483 /* YDBStorage.swift in Sources */,
+ 				724D47B02B97BE13001BE973 /* ZkParamsMigrator.swift in Sources */,
++				A1CCCDA9A3A4DC4E3E3DEF91 /* SigDemoAgentFrame.swift in Sources */,
++				DB20204B9391169C365A7D8D /* SigDemoAgentMessages.swift in Sources */,
++				14744240938AAD3455562FD8 /* SigDemoDeploymentBinding.swift in Sources */,
++				E5F919EF20263802FF39AAA6 /* SigDemoSQLCipherBridge.swift in Sources */,
+ 			);
+ 			runOnlyForDeploymentPostprocessing = 0;
+ 		};
+@@ -22052,7 +22128,7 @@
+ 				GCC_WARN_UNUSED_VALUE = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = YES;
+ 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Signal Messenger, LLC";
+-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
++				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+ 				ONLY_ACTIVE_ARCH = YES;
+ 				OTHER_CFLAGS = (
+ 					"-DNS_BLOCK_ASSERTIONS=1",
+@@ -22060,8 +22136,7 @@
+ 				);
+ 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD";
+ 				SDKROOT = iphoneos;
+-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+-				SIGNAL_MERCHANTID = org.signalfoundation;
++				SIGNAL_BUNDLEID_PREFIX = "dev.matbalez.sig-demo.ios";
+ 				SWIFT_COMPILATION_MODE = wholemodule;
+ 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
+ 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+@@ -22316,13 +22391,12 @@
+ 				GCC_WARN_UNUSED_VARIABLE = YES;
+ 				"INCLUDED_SOURCE_FILE_NAMES[arch=*]" = "$(MAYBE_INPUT_VIDEO_PATH)";
+ 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Signal Messenger, LLC";
+-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
++				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+ 				ONLY_ACTIVE_ARCH = YES;
+ 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+ 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD";
+ 				SDKROOT = iphoneos;
+-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+-				SIGNAL_MERCHANTID = org.signalfoundation;
++				SIGNAL_BUNDLEID_PREFIX = "dev.matbalez.sig-demo.ios";
+ 				SWIFT_COMPILATION_MODE = wholemodule;
+ 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
+ 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+@@ -22583,12 +22657,11 @@
+ 				GCC_WARN_UNUSED_VARIABLE = YES;
+ 				"INCLUDED_SOURCE_FILE_NAMES[arch=*]" = "$(MAYBE_INPUT_VIDEO_PATH)";
+ 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Signal Messenger, LLC";
+-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
++				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+ 				ONLY_ACTIVE_ARCH = YES;
+ 				OTHER_SWIFT_FLAGS = "$(inherited) -DTESTABLE_BUILD -DUSE_DEBUG_UI";
+ 				SDKROOT = iphoneos;
+-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+-				SIGNAL_MERCHANTID = org.signalfoundation;
++				SIGNAL_BUNDLEID_PREFIX = "dev.matbalez.sig-demo.ios";
+ 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+ 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
+ 				SWIFT_UPCOMING_FEATURE_CONCISE_MAGIC_FILE = YES;
+@@ -22686,12 +22759,11 @@
+ 				GCC_WARN_UNUSED_VALUE = YES;
+ 				GCC_WARN_UNUSED_VARIABLE = YES;
+ 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Signal Messenger, LLC";
+-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
++				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+ 				ONLY_ACTIVE_ARCH = NO;
+ 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+ 				SDKROOT = iphoneos;
+-				SIGNAL_BUNDLEID_PREFIX = org.whispersystems;
+-				SIGNAL_MERCHANTID = org.signalfoundation;
++				SIGNAL_BUNDLEID_PREFIX = "dev.matbalez.sig-demo.ios";
+ 				SWIFT_COMPILATION_MODE = wholemodule;
+ 				SWIFT_ENABLE_EXPLICIT_MODULES = NO;
+ 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+@@ -23396,6 +23468,48 @@
+ 			defaultConfigurationName = "App Store Release";
+ 		};
+ /* End XCConfigurationList section */
++
++/* Begin XCLocalSwiftPackageReference section */
++		18399E1750E7F1AFD62C21A4 /* XCLocalSwiftPackageReference "Mesh" */ = {
++			isa = XCLocalSwiftPackageReference;
++			relativePath = "__SIG_DEMO_MESH_PACKAGE_PATH__";
++		};
++		847D38A645B9BE371C8EE7C4 /* XCLocalSwiftPackageReference "PaidMesh" */ = {
++			isa = XCLocalSwiftPackageReference;
++			relativePath = "__SIG_DEMO_PAID_MESH_PACKAGE_PATH__";
++		};
++		9B3ED5924F623464EB4FD62B /* XCLocalSwiftPackageReference "SigDemoKit" */ = {
++			isa = XCLocalSwiftPackageReference;
++			relativePath = "__SIG_DEMO_KIT_PACKAGE_PATH__";
++		};
++		BDD78C51D79B1FA598B742E8 /* XCLocalSwiftPackageReference "NativeAgent" */ = {
++			isa = XCLocalSwiftPackageReference;
++			relativePath = "__SIG_DEMO_NATIVE_AGENT_PACKAGE_PATH__";
++		};
++/* End XCLocalSwiftPackageReference section */
++
++/* Begin XCSwiftPackageProductDependency section */
++		47FA82B064BC3B009874D290 /* SigDemoPaidMesh */ = {
++			isa = XCSwiftPackageProductDependency;
++			package = 847D38A645B9BE371C8EE7C4 /* XCLocalSwiftPackageReference "PaidMesh" */;
++			productName = SigDemoPaidMesh;
++		};
++		520ED89C73FACC682392FE55 /* SigDemoKit */ = {
++			isa = XCSwiftPackageProductDependency;
++			package = 9B3ED5924F623464EB4FD62B /* XCLocalSwiftPackageReference "SigDemoKit" */;
++			productName = SigDemoKit;
++		};
++		788DF4612C8BC55E3FBBF7D3 /* SigDemoMesh */ = {
++			isa = XCSwiftPackageProductDependency;
++			package = 18399E1750E7F1AFD62C21A4 /* XCLocalSwiftPackageReference "Mesh" */;
++			productName = SigDemoMesh;
++		};
++		83FE71E1DD2D7C78ED4FD1AC /* SigDemoAgent */ = {
++			isa = XCSwiftPackageProductDependency;
++			package = BDD78C51D79B1FA598B742E8 /* XCLocalSwiftPackageReference "NativeAgent" */;
++			productName = SigDemoAgent;
++		};
++/* End XCSwiftPackageProductDependency section */
+ 	};
+ 	rootObject = D221A080169C9E5E00537ABF /* Project object */;
+ }
+diff --git a/Signal/AppLaunch/AppDelegate.swift b/Signal/AppLaunch/AppDelegate.swift
+index 44e14af..3c535c7 100644
+--- a/Signal/AppLaunch/AppDelegate.swift
++++ b/Signal/AppLaunch/AppDelegate.swift
+@@ -21,6 +21,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
+         _ application: UIApplication,
+         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil,
+     ) -> Bool {
++        SigDemoBootstrap.shared.prepareTransport()
+         return lifecycleManager.didFinishLaunching(launchOptions: launchOptions)
+     }
+ 
+@@ -31,6 +32,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
+     /// UIKit generally prefers `SceneDelegate.sceneDidDisconnect(_:)` for
+     /// scene-based apps, which also calls through to the manager.
+     func applicationWillTerminate(_ application: UIApplication) {
++        SigDemoBootstrap.shared.stopTransport()
+         lifecycleManager.willTerminate()
+     }
+ 
+diff --git a/Signal/AppLaunch/AppEnvironment.swift b/Signal/AppLaunch/AppEnvironment.swift
+index c15b2fe..b7f8824 100644
+--- a/Signal/AppLaunch/AppEnvironment.swift
++++ b/Signal/AppLaunch/AppEnvironment.swift
+@@ -311,7 +311,10 @@ public class AppEnvironment: NSObject {
+         cron.scheduleFrequently(
+             mustBeRegistered: true,
+             mustBeConnected: true,
+-            operation: { try await backupSubscriptionManager.redeemSubscriptionIfNecessary() },
++            operation: {
++                guard TSConstants.libSignalEnv != .localDemo else { return }
++                try await backupSubscriptionManager.redeemSubscriptionIfNecessary()
++            },
+             handleResult: {
+                 switch $0 {
+                 case .success, .failure(is CancellationError), .failure(is NotRegisteredError):
+@@ -326,7 +329,10 @@ public class AppEnvironment: NSObject {
+         cron.scheduleFrequently(
+             mustBeRegistered: true,
+             mustBeConnected: true,
+-            operation: { try await backupTestFlightEntitlementManager.renewEntitlementIfNecessary() },
++            operation: {
++                guard TSConstants.libSignalEnv != .localDemo else { return }
++                try await backupTestFlightEntitlementManager.renewEntitlementIfNecessary()
++            },
+             handleResult: {
+                 switch $0 {
+                 case .success, .failure(is CancellationError), .failure(is NotRegisteredError):
+@@ -395,10 +401,12 @@ public class AppEnvironment: NSObject {
+             // Things that should run on either the primary or linked devices.
+             if let registeredState, registeredState.isPrimary {
+                 Task {
++                    guard TSConstants.libSignalEnv != .localDemo else { return }
+                     await storageServiceRecordIkmMigrator.migrateToManifestRecordIkmIfNecessary()
+                 }
+ 
+                 Task {
++                    guard TSConstants.libSignalEnv != .localDemo else { return }
+                     do {
+                         try await backupIdService.registerBackupIDIfNecessary(
+                             localAci: registeredState.localIdentifiers.aci,
+@@ -414,8 +422,10 @@ public class AppEnvironment: NSObject {
+                 // If we had an interrupted BackupExportJob or LocalFileBackupExportJob, resume it.
+                 // If both need resumption, BackupExportJob will take precedence and LocalFileBackupExportJob
+                 // will resume on next app setup.
+-                backupExportJobRunner.resumeIfNecessary()
+-                _ = localFileBackupExportJobRunner.resumeIfNecessary()
++                if TSConstants.libSignalEnv != .localDemo {
++                    backupExportJobRunner.resumeIfNecessary()
++                    _ = localFileBackupExportJobRunner.resumeIfNecessary()
++                }
+ 
+                 Task {
+                     await accountEntropyPoolManager.generateIfMissing()
+@@ -442,6 +452,7 @@ public class AppEnvironment: NSObject {
+             }
+ 
+             Task { () async -> Void in
++                guard TSConstants.libSignalEnv != .localDemo else { return }
+                 await self.backupDisablingManager.disableRemotelyIfNecessary()
+             }
+ 
+diff --git a/Signal/AppLaunch/AppLifecycleManager.swift b/Signal/AppLaunch/AppLifecycleManager.swift
+index 9fc6eff..e62c281 100644
+--- a/Signal/AppLaunch/AppLifecycleManager.swift
++++ b/Signal/AppLaunch/AppLifecycleManager.swift
+@@ -311,9 +311,13 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+         appReadiness.runNowOrWhenAppDidBecomeReadyAsync {
+             Task {
+                 await attachmentValidationRunner.scheduleBGProcessingTaskIfNeeded()
+-                await backupRunner.scheduleBGProcessingTaskIfNeeded()
++                if TSConstants.libSignalEnv != .localDemo {
++                    await backupRunner.scheduleBGProcessingTaskIfNeeded()
++                }
+                 await databaseMigratorRunner.scheduleBGProcessingTaskIfNeeded()
+-                await localFileBackupRunner.scheduleBGProcessingTaskIfNeeded()
++                if TSConstants.libSignalEnv != .localDemo {
++                    await localFileBackupRunner.scheduleBGProcessingTaskIfNeeded()
++                }
+ 
+ #if targetEnvironment(simulator)
+                 // The simulator won't run BGProcessingTasks, but we still want to run
+@@ -354,12 +358,16 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+     private func startLaunchPipeline(launchContext: LaunchContext) {
+         Logger.info("")
+         Task {
+-            let (finalContinuation, sleepBlockObject) = await setUpMainAppEnvironment(launchContext: launchContext)
+-            self.didLoadDatabase(
+-                finalContinuation: finalContinuation,
+-                launchContext: launchContext,
+-                sleepBlockObject: sleepBlockObject,
+-            )
++            do {
++                let (finalContinuation, sleepBlockObject) = try await setUpMainAppEnvironment(launchContext: launchContext)
++                self.didLoadDatabase(
++                    finalContinuation: finalContinuation,
++                    launchContext: launchContext,
++                    sleepBlockObject: sleepBlockObject,
++                )
++            } catch SigDemoDeploymentBinding.ValidationError.missingOrMismatchedBinding {
++                handleLaunchFailure(.privateDemoDeploymentMismatch)
++            }
+         }
+     }
+ 
+@@ -479,9 +487,15 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+ 
+     private func setUpMainAppEnvironment(
+         launchContext: LaunchContext,
+-    ) async -> (AppSetup.FinalContinuation, DeviceSleepBlockObject) {
++    ) async throws(SigDemoDeploymentBinding.ValidationError) -> (AppSetup.FinalContinuation, DeviceSleepBlockObject) {
+         let sleepBlockObject = DeviceSleepBlockObject(blockReason: "app launch")
+         launchContext.deviceSleepManager.addBlock(blockObject: sleepBlockObject)
++        var didSetUpEnvironment = false
++        defer {
++            if !didSetUpEnvironment {
++                launchContext.deviceSleepManager.removeBlock(blockObject: sleepBlockObject)
++            }
++        }
+ 
+         let _currentCall = AtomicValue<SignalCall?>(nil, lock: .init())
+         let currentCall = CurrentCall(rawValue: _currentCall)
+@@ -491,7 +505,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+             databaseStorage: launchContext.databaseStorage,
+         )
+         let globalsContinuation = await schemaMigrationContinuation.migrateDatabaseSchema()
+-        let dataMigrationContinuation = globalsContinuation.initGlobals(
++        let dataMigrationContinuation = try globalsContinuation.initGlobals(
+             appContext: launchContext.appContext,
+             appReadiness: appReadiness,
+             deviceBatteryLevelManager: DeviceBatteryLevelManagerImpl(),
+@@ -531,6 +545,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+         let finalContinuation = await dataMigrationContinuation.migrateDatabaseData()
+         finalContinuation.runLaunchTasksIfNeededAndReloadCaches()
+ 
++        didSetUpEnvironment = true
+         return (finalContinuation, sleepBlockObject)
+     }
+ 
+@@ -807,6 +822,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+             mustBeRegistered: true,
+             mustBeConnected: true,
+             operation: {
++                guard TSConstants.libSignalEnv != .localDemo else { return }
+                 let registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+                 try await backupRefreshManager.refreshBackup(
+                     localIdentifiers: registeredState.localIdentifiers,
+@@ -826,7 +842,9 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+         storageServiceManager.registerForCron(cron)
+ 
+         let keyTransparencyManager = dependenciesBridge.keyTransparencyManager
+-        keyTransparencyManager.registerSelfCheckForCron(cron: cron)
++        if TSConstants.libSignalEnv != .localDemo {
++            keyTransparencyManager.registerSelfCheckForCron(cron: cron)
++        }
+ 
+         // Note that this does much more than set a flag; it will also run all deferred blocks.
+         appReadiness.setAppIsReadyUIStillPending()
+@@ -902,14 +920,20 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+             mustBeRegistered: true,
+             mustBeDeviceType: .primary,
+             mustBeConnected: true,
+-            operation: { try await svr.refreshCredentialsIfNecessary() },
++            operation: {
++                guard TSConstants.libSignalEnv != .localDemo else { return }
++                try await svr.refreshCredentialsIfNecessary()
++            },
+         )
+ 
+         cron.scheduleFrequently(
+             mustBeRegistered: true,
+             mustBeDeviceType: .primary,
+             mustBeConnected: true,
+-            operation: { try await svr.refreshBackupIfNecessary() },
++            operation: {
++                guard TSConstants.libSignalEnv != .localDemo else { return }
++                try await svr.refreshBackupIfNecessary()
++            },
+         )
+ 
+         // Warm the "available emoji" cache, intentionally off the main thread.
+@@ -924,12 +948,12 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+             self.refreshConnection(isAppActive: false)
+         }
+ 
+-        if registeredState != nil {
++        if registeredState != nil && TSConstants.libSignalEnv != .localDemo {
+             // This should happen at any launch, background or foreground.
+             SyncPushTokensJob.run()
+         }
+ 
+-        if registeredState != nil {
++        if registeredState != nil && TSConstants.libSignalEnv != .localDemo {
+             Task {
+                 do {
+                     try await APNSRotationStore.rotateIfNeededOnAppLaunchAndReadiness(
+@@ -1076,12 +1100,14 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+         case databaseLoadFailed(keychainStorage: any KeychainStorage)
+         case preflight(LaunchPreflightError)
+         case corruptRegistrationState
++        case privateDemoDeploymentMismatch
+ 
+         var description: String {
+             switch self {
+             case .databaseLoadFailed: "databaseLoadFailed"
+             case .preflight(let error): "preflight: \(error.supportTag)"
+             case .corruptRegistrationState: "corruptRegistrationState"
++            case .privateDemoDeploymentMismatch: "privateDemoDeploymentMismatch"
+             }
+         }
+     }
+@@ -1108,6 +1134,15 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+         from viewController: UIViewController,
+     ) {
+         switch launchFailure {
++        case .privateDemoDeploymentMismatch:
++            let alert = UIAlertController(
++                title: "Separate test account required",
++                message: "This installation belongs to another demo deployment, or predates account isolation checks. Reopen its original build, or use a separate fresh installation to join this demo. Your saved account has not been changed.",
++                preferredStyle: .alert
++            )
++            alert.addAction(UIAlertAction(title: "OK", style: .default))
++            viewController.present(alert, animated: true)
++
+         case .databaseLoadFailed(let keychainStorage):
+             presentLaunchFailureActionSheet(
+                 from: viewController,
+@@ -1321,9 +1356,12 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+             setupSskEnvironment: { databaseStorage in
+                 return Task {
+                     self.launchContext.databaseStorage = databaseStorage
+-                    return await self.setUpMainAppEnvironment(launchContext: self.launchContext)
++                    return try await self.setUpMainAppEnvironment(launchContext: self.launchContext)
+                 }
+             },
++            onDeploymentMismatch: {
++                self.handleLaunchFailure(.privateDemoDeploymentMismatch)
++            },
+             launchApp: { finalContinuation, sleepBlockObject in
+                 // Pretend we didn't fail!
+                 self.didAppLaunchFail = false
+@@ -1550,7 +1588,7 @@ final class AppLifecycleManager: NSObject, UNUserNotificationCenterDelegate {
+             DispatchQueue.main.async {
+                 SSKEnvironment.shared.contactManagerImplRef.fetchSystemContactsOnceIfAlreadyAuthorized()
+ 
+-                if !UIApplication.shared.isRegisteredForRemoteNotifications {
++                if TSConstants.libSignalEnv != .localDemo && !UIApplication.shared.isRegisteredForRemoteNotifications {
+                     Logger.info("Retrying to register for remote notifications since user hasn't registered yet.")
+                     // Push tokens don't normally change while the app is launched, so checking once during launch is
+                     // usually sufficient, but e.g. on iOS11, users who have disabled "Allow Notifications" and disabled
+diff --git a/Signal/AppLaunch/SignalApp.swift b/Signal/AppLaunch/SignalApp.swift
+index 7827d0e..29291b7 100644
+--- a/Signal/AppLaunch/SignalApp.swift
++++ b/Signal/AppLaunch/SignalApp.swift
+@@ -70,6 +70,13 @@ public class SignalApp {
+             object: nil,
+         )
+ 
++        if let failure = SigDemoBootstrap.shared.failureControllerIfNeeded() {
++            window.rootViewController = failure
++            appReadiness.setUIIsReady()
++            return
++        }
++        SigDemoBootstrap.shared.startServices()
++
+         switch launchInterface {
+         case .registration(let registrationLoader, let desiredMode):
+             showRegistration(loader: registrationLoader, desiredMode: desiredMode, in: window)
+@@ -96,6 +103,7 @@ public class SignalApp {
+         }
+     }
+ 
++    @MainActor
+     func showRegistration(
+         loader: RegistrationCoordinatorLoader,
+         desiredMode: RegistrationMode,
+@@ -105,31 +113,18 @@ public class SignalApp {
+             owsFailDebug("Missing window.")
+             return
+         }
+-        let logger: PrefixedLogger
+-        switch desiredMode {
+-        case .registering:
+-            logger = PrefixedLogger(prefix: "[Reg]")
+-            logger.info("Attempting initial registration on app launch")
+-        case .reRegistering:
+-            logger = PrefixedLogger(prefix: "[ReReg]")
+-            logger.info("Attempting reregistration on app launch")
+-        case .changingNumber:
+-            logger = PrefixedLogger(prefix: "[ChgNum]")
+-            logger.info("Attempting change number registration on app launch")
++        window.rootViewController = SigDemoBootstrap.shared.registrationController { [weak self, weak window] in
++            self?.showConversationSplitView(in: window)
+         }
+-        let coordinator = SSKEnvironment.shared.databaseStorageRef.write { tx in
+-            return loader.coordinator(forDesiredMode: desiredMode, transaction: tx, logger: logger)
+-        }
+-        let navController = RegistrationNavigationController.withCoordinator(coordinator)
+-
+-        window.rootViewController = navController
+-
+         conversationSplitViewController = nil
+     }
+ 
+     @MainActor
+     func showSecondaryProvisioning(skipOnboarding: Bool) {
+-        ProvisioningController.presentProvisioningFlow(skipOnboarding: skipOnboarding)
++        guard let window = CurrentAppContext().mainWindow else { return }
++        window.rootViewController = SigDemoBootstrap.shared.registrationController { [weak self, weak window] in
++            self?.showConversationSplitView(in: window)
++        }
+         conversationSplitViewController = nil
+     }
+ 
+diff --git a/Signal/Backups/BackupEnablingManager.swift b/Signal/Backups/BackupEnablingManager.swift
+index ec33ad5..d8444b8 100644
+--- a/Signal/Backups/BackupEnablingManager.swift
++++ b/Signal/Backups/BackupEnablingManager.swift
+@@ -62,6 +62,9 @@ final class BackupEnablingManager {
+         fromViewController: UIViewController,
+         planSelection: PlanSelection,
+     ) async throws(SheetDisplayableError) {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            throw ActionSheetDisplayableError(localizedMessage: "Cloud backups are unavailable in this isolated test app.")
++        }
+         let registeredState: RegisteredState
+         do throws(NotRegisteredError) {
+             registeredState = try tsAccountManager.registeredStateWithMaybeSneakyTransaction()
+diff --git a/Signal/ConversationView/ConversationViewController+BodyRangesTextViewDelegate.swift b/Signal/ConversationView/ConversationViewController+BodyRangesTextViewDelegate.swift
+index 3ebb322..8d1ad2e 100644
+--- a/Signal/ConversationView/ConversationViewController+BodyRangesTextViewDelegate.swift
++++ b/Signal/ConversationView/ConversationViewController+BodyRangesTextViewDelegate.swift
+@@ -8,6 +8,8 @@ public import SignalServiceKit
+ public import SignalUI
+ 
+ extension ConversationViewController: BodyRangesTextViewDelegate {
++    public var offersSigAssistantMention: Bool { SigDemoAgentService.isAvailable }
++
+     var supportsMentions: Bool { thread.allowsMentionSend }
+ 
+     public func textViewDidBeginTypingMention(_ textView: BodyRangesTextView) {}
+diff --git a/Signal/ConversationView/ConversationViewController+ConversationInputToolbarDelegate.swift b/Signal/ConversationView/ConversationViewController+ConversationInputToolbarDelegate.swift
+index ddf2476..4928a98 100644
+--- a/Signal/ConversationView/ConversationViewController+ConversationInputToolbarDelegate.swift
++++ b/Signal/ConversationView/ConversationViewController+ConversationInputToolbarDelegate.swift
+@@ -81,7 +81,38 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
+         )
+     }
+ 
+-    private func tryToSendTextMessage(_ messageBody: MessageBody, updateKeyboardState: Bool, untrustedThreshold: Date) {
++    func factCheckReplyDraft(for item: CVItemViewModelImpl) -> DraftQuotedReplyModel? {
++        guard SigDemoAgentService.isAvailable, SigDemoAgentService.shared.currentAccountID != nil,
++              inputToolbar != nil, shouldAllowMessageSendActionsForItem(item) else { return nil }
++        return SSKEnvironment.shared.databaseStorageRef.read { tx in
++            guard let currentThread = TSThread.fetchViaCache(uniqueId: thread.uniqueId, transaction: tx),
++                  currentThread.canSendChatMessagesToThread(), !currentThread.hasPendingMessageRequest(transaction: tx),
++                  !SSKEnvironment.shared.blockingManagerRef.isThreadBlocked(currentThread, transaction: tx),
++                  let message = TSMessage.fetchMessageViaCache(uniqueId: item.interaction.uniqueId, transaction: tx),
++                  message.uniqueThreadId == currentThread.uniqueId,
++                  SigDemoAgentMessages.eligibleReplyRecord(message, tx: tx) != nil else { return nil }
++            if let outgoing = message as? TSOutgoingMessage, outgoing.messageState != .sent { return nil }
++            return DependenciesBridge.shared.quotedReplyManager.buildDraftQuotedReply(
++                originalMessage: message,
++                loadNormalizedImage: NormalizedImage.loadImage(imageSource:maxPixelSize:),
++                tx: tx,
++            )
++        }
++    }
++
++    func sendFactCheck(for item: CVItemViewModelImpl) {
++        tryToSendTextMessage(
++            MessageBody(text: "@sig fact check this please", ranges: .empty),
++            updateKeyboardState: false,
++            untrustedThreshold: Date().addingTimeInterval(-OWSIdentityManagerImpl.Constants.defaultUntrustedInterval),
++            factCheckTarget: item,
++        )
++    }
++
++    private func tryToSendTextMessage(
++        _ messageBody: MessageBody, updateKeyboardState: Bool, untrustedThreshold: Date,
++        factCheckTarget: CVItemViewModelImpl? = nil,
++    ) {
+         AssertIsOnMainThread()
+ 
+         guard hasViewWillAppearEverBegun else {
+@@ -95,7 +126,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
+         guard !isBlockedConversation() else {
+             showUnblockConversationUI { [weak self] isBlocked in
+                 if !isBlocked {
+-                    self?.tryToSendTextMessage(messageBody, updateKeyboardState: false, untrustedThreshold: untrustedThreshold)
++                    self?.tryToSendTextMessage(messageBody, updateKeyboardState: false, untrustedThreshold: untrustedThreshold, factCheckTarget: factCheckTarget)
+                 }
+             }
+             return
+@@ -108,7 +139,7 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
+         ) { [weak self] didConfirmIdentity in
+             guard let self else { return }
+             if didConfirmIdentity {
+-                self.tryToSendTextMessage(messageBody, updateKeyboardState: false, untrustedThreshold: newUntrustedThreshold)
++                self.tryToSendTextMessage(messageBody, updateKeyboardState: false, untrustedThreshold: newUntrustedThreshold, factCheckTarget: factCheckTarget)
+             }
+         }
+         if didShowSNAlert {
+@@ -119,7 +150,21 @@ extension ConversationViewController: ConversationInputToolbarDelegate {
+             return
+         }
+ 
++        // Re-resolve the selected message after any unblock or identity confirmation.
++        let factCheckQuote = factCheckTarget.flatMap { factCheckReplyDraft(for: $0) }
++        if factCheckTarget != nil && factCheckQuote == nil { return }
++
+         let didAddToProfileWhitelist = ThreadUtil.addThreadToProfileWhitelistIfEmptyOrPendingRequestAndSetDefaultTimerWithSneakyTransaction(thread)
++        if let factCheckQuote {
++            ThreadUtil.enqueueMessage(
++                body: messageBody,
++                thread: thread,
++                quotedReplyDraft: factCheckQuote,
++                persistenceCompletionHandler: { [weak self] in self?.loadCoordinator.enqueueReload() },
++            )
++            if didAddToProfileWhitelist { ensureBannerState() }
++            return
++        }
+ 
+         let editValidationError: EditSendValidationError? = SSKEnvironment.shared.databaseStorageRef.read { transaction in
+             if let editTarget = inputToolbar.editTarget {
+diff --git a/Signal/ConversationView/ConversationViewController+MessageActions.swift b/Signal/ConversationView/ConversationViewController+MessageActions.swift
+index c7f5d92..a22291d 100644
+--- a/Signal/ConversationView/ConversationViewController+MessageActions.swift
++++ b/Signal/ConversationView/ConversationViewController+MessageActions.swift
+@@ -114,13 +114,13 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
+             }
+ 
+             var contextMenuActions: [ContextMenuAction] = []
+-            if let actions = self.collectionViewActiveContextMenuInteraction?.messageActions {
++            if let context = self.collectionViewActiveContextMenuInteraction {
+ 
+                 let actionOrder = MessageAction.MessageActionType.allCases
+                     .sorted { $0.priority < $1.priority }
+ 
+                 for type in actionOrder {
+-                    let actionWithType = actions.first { $0.actionType == type }
++                    let actionWithType = context.messageActions.first { $0.actionType == type }
+                     if let messageAction = actionWithType {
+                         contextMenuActions.append(ContextMenuAction(
+                             title: messageAction.contextMenuTitle,
+@@ -130,6 +130,14 @@ extension ConversationViewController: ContextMenuInteractionDelegate {
+                                 messageAction.block(nil)
+                             },
+                         ))
++                        if type == .reply, self.factCheckReplyDraft(for: context.itemViewModel) != nil {
++                            let item = context.itemViewModel
++                            contextMenuActions.append(ContextMenuAction(
++                                title: "Fact check",
++                                image: UIImage(systemName: "checkmark.bubble"),
++                                handler: { [weak self] _ in self?.sendFactCheck(for: item) },
++                            ))
++                        }
+                     }
+                 }
+             }
+diff --git a/Signal/ConversationView/ConversationViewController+Notifications.swift b/Signal/ConversationView/ConversationViewController+Notifications.swift
+--- a/Signal/ConversationView/ConversationViewController+Notifications.swift
++++ b/Signal/ConversationView/ConversationViewController+Notifications.swift
+@@ -7,8 +7,20 @@
+ import SignalServiceKit
+ 
+ extension ConversationViewController {
++    #if SIG_DEMO_LOCAL_MODEL
++    @objc private func sigLocalProgressChanged(_ notification: Notification) {
++        guard let changedThread = notification.object as? String, changedThread == thread.uniqueId,
++              viewIfLoaded?.window != nil else { return }
++        updateNavigationBarSubtitleLabel()
++    }
++    #endif
++
+     func addNotificationListeners() {
+         AssertIsOnMainThread()
++        #if SIG_DEMO_LOCAL_MODEL
++        NotificationCenter.default.addObserver(self, selector: #selector(sigLocalProgressChanged(_:)),
++            name: SigDemoAgentService.localProgressDidChange, object: nil)
++        #endif
+ 
+         NotificationCenter.default.addObserver(
+             self,
+diff --git a/Signal/ConversationView/ConversationViewController+UI.swift b/Signal/ConversationView/ConversationViewController+UI.swift
+--- a/Signal/ConversationView/ConversationViewController+UI.swift
++++ b/Signal/ConversationView/ConversationViewController+UI.swift
+@@ -270,6 +270,14 @@
+     }
+ 
+     public func updateNavigationBarSubtitleLabel() {
++        #if SIG_DEMO_LOCAL_MODEL
++        if let progress = SigDemoAgentService.shared.localProgress(for: thread.uniqueId) {
++            headerView.subtitleLabel.text = progress.subtitle
++            headerView.subtitleLabel.accessibilityLabel = progress.spoken
++            return
++        }
++        headerView.subtitleLabel.accessibilityLabel = nil
++        #endif
+         let subtitleText = NSMutableAttributedString()
+         let subtitleFont = headerView.subtitleLabel.font!
+         // To ensure a single source of text color do not set `color` attributes unless you really need to.
+diff --git a/Signal/ConversationView/Loading/CVItemViewState.swift b/Signal/ConversationView/Loading/CVItemViewState.swift
+index 73b2983..4825044 100644
+--- a/Signal/ConversationView/Loading/CVItemViewState.swift
++++ b/Signal/ConversationView/Loading/CVItemViewState.swift
+@@ -307,6 +307,12 @@ struct CVItemModelBuilder: CVItemBuilding {
+         itemViewState.previousUIMode = viewStateSnapshot.previousUIMode
+ 
+         func canClusterMessages(_ left: ItemBuilder, _ right: ItemBuilder) -> Bool {
++            if let leftMessage = left.interaction as? TSMessage,
++               let rightMessage = right.interaction as? TSMessage,
++               SigDemoAgentMessages.isResponse(leftMessage, tx: transaction)
++                || SigDemoAgentMessages.isResponse(rightMessage, tx: transaction) {
++                return false
++            }
+             let leftTime = left.interaction.receivedAtTimestamp
+             let rightTime = right.interaction.receivedAtTimestamp
+             if rightTime < leftTime {
+@@ -406,12 +412,13 @@ struct CVItemModelBuilder: CVItemBuilding {
+                 itemViewState.isLastInCluster = true
+             }
+ 
+-            if thread.isGroupThread {
++            let isSigResponse = SigDemoAgentMessages.isResponse(incomingMessage, tx: transaction)
++            if thread.isGroupThread || isSigResponse {
+                 // Show the sender name for incoming group messages unless
+                 // the previous message has the same sender name and
+                 // no "date break" separates us.
+                 var shouldShowSenderName = true
+-                let authorName = displayNameCache.displayName(address: incomingSenderAddress, transaction: transaction)
++                let authorName = isSigResponse ? "Sig" : displayNameCache.displayName(address: incomingSenderAddress, transaction: transaction)
+                 itemViewState.accessibilityAuthorName = authorName
+ 
+                 if
+@@ -421,11 +428,12 @@ struct CVItemModelBuilder: CVItemBuilding {
+                     let previousIncomingSenderAddress = previousIncomingMessage.authorAddress
+                     owsAssertDebug(previousIncomingSenderAddress.isValid)
+ 
+-                    shouldShowSenderName = incomingSenderAddress != previousIncomingSenderAddress
++                    shouldShowSenderName = isSigResponse || incomingSenderAddress != previousIncomingSenderAddress
+                 }
+ 
+                 var memberLabel: String?
+                 if
++                    !isSigResponse,
+                     let groupThread = thread as? TSGroupThread,
+                     !threadViewModel.hasPendingMessageRequest,
+                     let senderAci = incomingSenderAddress.aci
+diff --git a/Signal/Debugging/DebugLogs.swift b/Signal/Debugging/DebugLogs.swift
+index b38f60a..e8a9896 100644
+--- a/Signal/Debugging/DebugLogs.swift
++++ b/Signal/Debugging/DebugLogs.swift
+@@ -331,6 +331,10 @@ final class DebugLogs {
+     }
+ 
+     func uploadLogs() async throws(DebugLogsError) -> URL {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            // Private demo diagnostics must never reach Signal's log service.
++            throw DebugLogsError.noLogs
++        }
+         guard let logsDirPath = await collectLogsTask.value else {
+             throw DebugLogsError.noLogs
+         }
+diff --git a/Signal/DeviceTransfer/OutgoingDeviceTransferTask.swift b/Signal/DeviceTransfer/OutgoingDeviceTransferTask.swift
+index 8e472a4..1a46404 100644
+--- a/Signal/DeviceTransfer/OutgoingDeviceTransferTask.swift
++++ b/Signal/DeviceTransfer/OutgoingDeviceTransferTask.swift
+@@ -255,7 +255,7 @@ class OutgoingDeviceTransferTask {
+                     let store = NewKeyValueStore(collection: "DeviceTransferWAL")
+                     store.writeValue(Randomness.generateRandomBytes(32), forKey: "MustBeNonEmpty", tx: tx)
+                     store.removeValue(forKey: "MustBeNonEmpty", tx: tx)
+-                    sqlite3_db_cacheflush(tx.database.sqliteConnection!)
++                    SigDemoSQLCipherBridge.cacheFlush(tx.database.sqliteConnection!)
+                     do {
+                         let dbCopy = try Self.makeLocalCopy(databaseFile: database.database)
+                         let walCopy = try Self.makeLocalCopy(databaseFile: database.wal)
+diff --git a/Signal/Megaphones/ExperienceUpgradeManager.swift b/Signal/Megaphones/ExperienceUpgradeManager.swift
+index 9083626..2d8f9a1 100644
+--- a/Signal/Megaphones/ExperienceUpgradeManager.swift
++++ b/Signal/Megaphones/ExperienceUpgradeManager.swift
+@@ -106,6 +106,15 @@ class ExperienceUpgradeManager {
+ 
+             var nextMegaphone: Megaphone?
+             for upgrade in allKnownExperienceUpgrades(tx: tx) {
++                if TSConstants.libSignalEnv == .localDemo {
++                    switch upgrade.manifest {
++                    case .introducingPins, .pinReminder, .recoveryKeyReminder,
++                         .backupsUpsellReminder, .backupsEnabledRecentlyNotification:
++                        continue
++                    default:
++                        break
++                    }
++                }
+                 if nextMegaphone != nil {
+                     break
+                 }
+diff --git a/Signal/Notifications/PushRegistrationManager.swift b/Signal/Notifications/PushRegistrationManager.swift
+index b58ec79..2d88e56 100644
+--- a/Signal/Notifications/PushRegistrationManager.swift
++++ b/Signal/Notifications/PushRegistrationManager.swift
+@@ -65,6 +65,9 @@ public class PushRegistrationManager: NSObject, PKPushRegistryDelegate {
+         forceRotation: Bool,
+         timeOutEventually: Bool = false,
+     ) async throws -> ApnRegistrationId {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            throw PushRegistrationError.pushNotSupported(description: "This test app uses foreground message delivery.")
++        }
+         Logger.info("")
+         await self.registerUserNotificationSettings()
+ 
+diff --git a/Signal/Notifications/SyncPushTokensJob.swift b/Signal/Notifications/SyncPushTokensJob.swift
+index e8b4a83..339118d 100644
+--- a/Signal/Notifications/SyncPushTokensJob.swift
++++ b/Signal/Notifications/SyncPushTokensJob.swift
+@@ -21,6 +21,8 @@ class SyncPushTokensJob: NSObject {
+     private static let hasUploadedTokensOnce = AtomicBool(false, lock: .sharedGlobal)
+ 
+     func run() async throws {
++        // Invite accounts use foreground/manual delivery; the private server has no APNs.
++        guard TSConstants.libSignalEnv != .localDemo else { return }
+         switch mode {
+         case .normal:
+             // Don't rotate.
+diff --git a/Signal/Provisioning/UserInterface/ProvisioningController.swift b/Signal/Provisioning/UserInterface/ProvisioningController.swift
+index e7e892a..8ca78e0 100644
+--- a/Signal/Provisioning/UserInterface/ProvisioningController.swift
++++ b/Signal/Provisioning/UserInterface/ProvisioningController.swift
+@@ -156,7 +156,10 @@ class ProvisioningController: NSObject {
+ 
+         Logger.info("")
+         let loader = RegistrationCoordinatorLoaderImpl(dependencies: .from(self))
+-        SignalApp.shared.showRegistration(loader: loader, desiredMode: .registering)
++        // The existing synchronous UI callback already requires the main thread.
++        MainActor.assumeIsolated {
++            SignalApp.shared.showRegistration(loader: loader, desiredMode: .registering)
++        }
+     }
+ 
+     @MainActor
+diff --git a/Signal/Signal-AppStore.entitlements b/Signal/Signal-AppStore.entitlements
+index d3a1261..8eefb83 100644
+--- a/Signal/Signal-AppStore.entitlements
++++ b/Signal/Signal-AppStore.entitlements
+@@ -5,23 +5,12 @@
+ 	<key>aps-environment</key>
+ 	<string>development</string>
+ 	<key>com.apple.developer.associated-domains</key>
+-	<array>
+-		<string>applinks:signal.art</string>
+-		<string>applinks:signal.tube</string>
+-		<string>applinks:signal.group</string>
+-		<string>applinks:signal.me</string>
+-		<string>applinks:signaldonations.org</string>
+-		<string>applinks:signal.link</string>
+-		<string>webcredentials:signal.org</string>
+-	</array>
++	<array/>
+ 	<key>com.apple.developer.default-data-protection</key>
+ 	<string>NSFileProtectionComplete</string>
+ 	<key>com.apple.developer.icloud-container-identifiers</key>
+ 	<array/>
+-	<key>com.apple.developer.in-app-payments</key>
+-	<array>
+-		<string>merchant.$(SIGNAL_MERCHANTID)</string>
+-	</array>
++
+ 	<key>com.apple.developer.networking.carrier-constrained.app-optimized</key>
+ 	<true/>
+ 	<key>com.apple.developer.networking.carrier-constrained.appcategory</key>
+diff --git a/Signal/Signal-Info.plist b/Signal/Signal-Info.plist
+index dae3f22..9d4b579 100644
+--- a/Signal/Signal-Info.plist
++++ b/Signal/Signal-Info.plist
+@@ -15,7 +15,7 @@
+ 	<key>CFBundleDevelopmentRegion</key>
+ 	<string>en</string>
+ 	<key>CFBundleDisplayName</key>
+-	<string>${PRODUCT_NAME}</string>
++	<string>sig demo</string>
+ 	<key>CFBundleExecutable</key>
+ 	<string>${EXECUTABLE_NAME}</string>
+ 	<key>CFBundleGetInfoString</key>
+@@ -43,7 +43,7 @@
+ 			<string>$(SIGNAL_BUNDLEID_PREFIX).signal</string>
+ 			<key>CFBundleURLSchemes</key>
+ 			<array>
+-				<string>sgnl</string>
++				<string>sig-demo</string>
+ 			</array>
+ 		</dict>
+ 	</array>
+@@ -106,7 +106,7 @@
+ 	<key>OWSBundleIDPrefix</key>
+ 	<string>$(SIGNAL_BUNDLEID_PREFIX)</string>
+ 	<key>OWSMerchantID</key>
+-	<string>$(SIGNAL_MERCHANTID)</string>
++	<string>dev.matbalez.sig-demo.ios.disabled</string>
+ 	<key>PHPhotoLibraryPreventAutomaticLimitedAccessAlert</key>
+ 	<true/>
+ 	<key>UIApplicationSceneManifest</key>
+diff --git a/Signal/Signal.entitlements b/Signal/Signal.entitlements
+index 8a0f2ad..cf11145 100644
+--- a/Signal/Signal.entitlements
++++ b/Signal/Signal.entitlements
+@@ -5,23 +5,12 @@
+ 	<key>aps-environment</key>
+ 	<string>development</string>
+ 	<key>com.apple.developer.associated-domains</key>
+-	<array>
+-		<string>applinks:signal.art</string>
+-		<string>applinks:signal.tube</string>
+-		<string>applinks:signal.group</string>
+-		<string>applinks:signal.me</string>
+-		<string>applinks:signaldonations.org</string>
+-		<string>applinks:signal.link</string>
+-		<string>webcredentials:signal.org</string>
+-	</array>
++	<array/>
+ 	<key>com.apple.developer.default-data-protection</key>
+ 	<string>NSFileProtectionComplete</string>
+ 	<key>com.apple.developer.icloud-container-identifiers</key>
+ 	<array/>
+-	<key>com.apple.developer.in-app-payments</key>
+-	<array>
+-		<string>merchant.$(SIGNAL_MERCHANTID)</string>
+-	</array>
++
+ 	<key>com.apple.developer.networking.carrier-constrained.app-optimized</key>
+ 	<true/>
+ 	<key>com.apple.developer.networking.carrier-constrained.appcategory</key>
+diff --git a/Signal/src/ViewControllers/AppSettings/Account/AccountSettingsViewController.swift b/Signal/src/ViewControllers/AppSettings/Account/AccountSettingsViewController.swift
+index bd75a61..dd6993a 100644
+--- a/Signal/src/ViewControllers/AppSettings/Account/AccountSettingsViewController.swift
++++ b/Signal/src/ViewControllers/AppSettings/Account/AccountSettingsViewController.swift
+@@ -40,8 +40,9 @@ class AccountSettingsViewController: OWSTableViewController2 {
+         let tsAccountManager = DependenciesBridge.shared.tsAccountManager
+         let tsRegistrationState = tsAccountManager.registrationStateWithMaybeSneakyTransaction
+ 
+-        // Show the change pin and reglock sections
++        // Private invite accounts have no Signal PIN/recovery service.
+         if
++            TSConstants.libSignalEnv != .localDemo,
+             let registeredState = try? tsRegistrationState.registeredState(),
+             registeredState.isPrimary,
+             registeredState.localIdentifiers.hasPhoneNumber
+diff --git a/Signal/src/ViewControllers/AppSettings/AppSettingsViewController.swift b/Signal/src/ViewControllers/AppSettings/AppSettingsViewController.swift
+index ba04327..8677cc3 100644
+--- a/Signal/src/ViewControllers/AppSettings/AppSettingsViewController.swift
++++ b/Signal/src/ViewControllers/AppSettings/AppSettingsViewController.swift
+@@ -196,6 +196,16 @@ class AppSettingsViewController: OWSTableViewController2 {
+         contents.add(section1)
+ 
+         let section2 = OWSTableSection()
++        if SigDemoAgentService.isAvailable {
++            section2.add(.disclosureItem(
++                icon: .settingsChats,
++                withText: "Sig agent",
++                subtitle: "Choose an inference provider",
++                actionBlock: { [weak self] in
++                    self?.navigationController?.pushViewController(SigDemoInferenceSettingsViewController(), animated: true)
++                }
++            ))
++        }
+         section2.add(.disclosureItem(
+             icon: .settingsAppearance,
+             withText: OWSLocalizedString("SETTINGS_APPEARANCE_TITLE", comment: "The title for the appearance settings."),
+@@ -240,7 +250,7 @@ class AppSettingsViewController: OWSTableViewController2 {
+             },
+         ))
+ 
+-        if isPrimaryDevice {
++        if isPrimaryDevice && TSConstants.libSignalEnv != .localDemo {
+             section2.add(.disclosureItem(
+                 icon: .backup,
+                 withText: OWSLocalizedString(
+@@ -279,7 +289,7 @@ class AppSettingsViewController: OWSTableViewController2 {
+                     )
+                 },
+             ))
+-        } else {
++        } else if TSConstants.libSignalEnv != .localDemo {
+             section2.add(.disclosureItem(
+                 icon: .backup,
+                 withText: OWSLocalizedString(
+diff --git a/Signal/src/ViewControllers/AppSettings/ComposeSupportEmailOperation.swift b/Signal/src/ViewControllers/AppSettings/ComposeSupportEmailOperation.swift
+index 4857df4..12305af 100644
+--- a/Signal/src/ViewControllers/AppSettings/ComposeSupportEmailOperation.swift
++++ b/Signal/src/ViewControllers/AppSettings/ComposeSupportEmailOperation.swift
+@@ -161,6 +161,10 @@ final class ComposeSupportEmailOperation: NSObject {
+     }
+ 
+     func perform() async throws(EmailError) {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            // Demo support is provided by the inviter, not Signal Messenger.
++            throw EmailError.failedToOpenURL
++        }
+         if Task.isCancelled {
+             return
+         }
+@@ -224,6 +228,7 @@ final class ComposeSupportEmailOperation: NSObject {
+     }
+ 
+     private var emailURL: URL? {
++        guard TSConstants.libSignalEnv != .localDemo else { return nil }
+         let linkBuilder = MailtoLink(
+             to: "support@signal.org",
+             subject: model.localizedSubject,
+diff --git a/Signal/src/ViewControllers/AppSettings/HelpViewController.swift b/Signal/src/ViewControllers/AppSettings/HelpViewController.swift
+index b2ca57a..ba0e4aa 100644
+--- a/Signal/src/ViewControllers/AppSettings/HelpViewController.swift
++++ b/Signal/src/ViewControllers/AppSettings/HelpViewController.swift
+@@ -15,6 +15,10 @@ final class HelpViewController: OWSTableViewController2 {
+     }
+ 
+     private func updateTableContents() {
++        if TSConstants.libSignalEnv == .localDemo {
++            updateDemoTableContents()
++            return
++        }
+         let helpTitle = CommonStrings.help
+         let supportCenterLabel = OWSLocalizedString(
+             "HELP_SUPPORT_CENTER",
+@@ -98,6 +102,27 @@ final class HelpViewController: OWSTableViewController2 {
+ 
+         self.contents = contents
+     }
++
++    private func updateDemoTableContents() {
++        let contents = OWSTableContents(title: "Sig Demo help")
++        let support = OWSTableSection(title: "Private demo support")
++        support.footerTitle = "Sig Demo is a modified private test build based on Signal iOS, independent of Signal Messenger. For support or to share diagnostics, contact the person who invited you. This Help screen does not upload debug logs."
++        support.add(.copyableItem(label: "Version", value: AppVersionImpl.shared.prettyAppVersion))
++        contents.add(support)
++
++        let privacy = OWSTableSection(title: "Demo privacy")
++        privacy.footerTitle = "Demo accounts use the private test messaging service. Invoking Sig sends your question and eligible conversation context to your selected inference provider. A local web search sends its search query to Brave. Paid Mesh also uses Mesh and Lexe for inference and wallet operations. Contact your demo organizer for the privacy information for this test distribution."
++        contents.add(privacy)
++
++        let legal = OWSTableSection(title: "License and source")
++        legal.footerTitle = "Upstream copyright and license notices are retained. Open About Sig Demo and choose Share corresponding source to save this build's bundled source archive and build instructions."
++        legal.add(.disclosureItem(withText: "About Sig Demo and GNU AGPLv3", actionBlock: { [weak self] in
++            guard let self else { return }
++            SigDemoInferenceSettingsViewController.presentDemoAbout(from: self)
++        }))
++        contents.add(legal)
++        self.contents = contents
++    }
+ }
+ 
+ // MARK: -
+diff --git a/Signal/src/ViewControllers/DatabaseRecoveryViewController.swift b/Signal/src/ViewControllers/DatabaseRecoveryViewController.swift
+index 170ccdc..6ef6d19 100644
+--- a/Signal/src/ViewControllers/DatabaseRecoveryViewController.swift
++++ b/Signal/src/ViewControllers/DatabaseRecoveryViewController.swift
+@@ -12,7 +12,8 @@ class DatabaseRecoveryViewController<SetupResult>: OWSViewController {
+     private let deviceSleepManager: DeviceSleepManagerImpl
+     private let keychainStorage: any KeychainStorage
+     private let logger: PrefixedLogger
+-    private let setupSskEnvironment: (SDSDatabaseStorage) -> Task<SetupResult, Never>
++    private let setupSskEnvironment: (SDSDatabaseStorage) -> Task<SetupResult, Error>
++    private let onDeploymentMismatch: () -> Void
+     private let launchApp: (SetupResult) -> Void
+ 
+     init(
+@@ -20,7 +21,8 @@ class DatabaseRecoveryViewController<SetupResult>: OWSViewController {
+         corruptDatabaseStorage: SDSDatabaseStorage,
+         deviceSleepManager: DeviceSleepManagerImpl,
+         keychainStorage: any KeychainStorage,
+-        setupSskEnvironment: @escaping (SDSDatabaseStorage) -> Task<SetupResult, Never>,
++        setupSskEnvironment: @escaping (SDSDatabaseStorage) -> Task<SetupResult, Error>,
++        onDeploymentMismatch: @escaping () -> Void,
+         launchApp: @escaping (SetupResult) -> Void,
+     ) {
+         self.appReadiness = appReadiness
+@@ -30,6 +32,7 @@ class DatabaseRecoveryViewController<SetupResult>: OWSViewController {
+         self.logger = PrefixedLogger(prefix: "[DatabaseRecovery]")
+ 
+         self.setupSskEnvironment = setupSskEnvironment
++        self.onDeploymentMismatch = onDeploymentMismatch
+         self.launchApp = launchApp
+         super.init()
+     }
+@@ -304,8 +307,8 @@ class DatabaseRecoveryViewController<SetupResult>: OWSViewController {
+                     keychainStorage: self.keychainStorage,
+                 )
+ 
+-                return Guarantee.wrapAsync {
+-                    await self.setupSskEnvironment(databaseStorage).value
++                return Promise.wrapAsync {
++                    try await self.setupSskEnvironment(databaseStorage).value
+                 }.map(on: DispatchQueue.sharedUserInitiated) { setupResult in
+                     if shouldDumpAndRecreate {
+                         let recreateFTSIndexOperation = DatabaseRecovery.RecreateFTSIndexOperation(databaseStorage: databaseStorage)
+@@ -318,8 +321,8 @@ class DatabaseRecoveryViewController<SetupResult>: OWSViewController {
+                 }
+             }
+         case .corruptedButAlreadyDumpedAndRestored:
+-            promise = Guarantee.wrapAsync {
+-                await self.setupSskEnvironment(self.corruptDatabaseStorage).value
++            promise = Promise.wrapAsync {
++                try await self.setupSskEnvironment(self.corruptDatabaseStorage).value
+             }.map(on: DispatchQueue.sharedUserInitiated) { setupResult in
+                 let recreateFTSIndexOperation = DatabaseRecovery.RecreateFTSIndexOperation(
+                     databaseStorage: self.corruptDatabaseStorage,
+@@ -362,6 +365,11 @@ class DatabaseRecoveryViewController<SetupResult>: OWSViewController {
+     private func didRecoveryFail(with error: Error) {
+         DispatchQueue.main.async { [weak self] in
+             guard let self else { return }
++            if error is SigDemoDeploymentBinding.ValidationError {
++                self.deviceSleepManager.removeBlock(blockObject: self.sleepBlock)
++                self.dismiss(animated: false) { self.onDeploymentMismatch() }
++                return
++            }
+             if let error = error as? DatabaseRecoveryError {
+                 switch error {
+                 case .ranOutOfDiskSpace:
+diff --git a/SignalNSE/Info.plist b/SignalNSE/Info.plist
+index 0339773..e145d86 100644
+--- a/SignalNSE/Info.plist
++++ b/SignalNSE/Info.plist
+@@ -43,6 +43,6 @@
+ 	<key>OWSBundleIDPrefix</key>
+ 	<string>$(SIGNAL_BUNDLEID_PREFIX)</string>
+ 	<key>OWSMerchantID</key>
+-	<string>$(SIGNAL_MERCHANTID)</string>
++	<string>dev.matbalez.sig-demo.ios.disabled</string>
+ </dict>
+ </plist>
+diff --git a/SignalNSE/NSEEnvironment.swift b/SignalNSE/NSEEnvironment.swift
+index 8a3bb07..c59b4ce 100644
+--- a/SignalNSE/NSEEnvironment.swift
++++ b/SignalNSE/NSEEnvironment.swift
+@@ -54,7 +54,7 @@ class NSEEnvironment {
+         )
+         databaseStorage.grdbStorage.setUpDatabasePathKVO()
+ 
+-        let finalContinuation = await AppSetup()
++        let finalContinuation = try await AppSetup()
+             .start(
+                 appContext: appContext,
+                 databaseStorage: databaseStorage,
+diff --git a/SignalServiceKit/Backups/Archiving/BackupPurpose.swift b/SignalServiceKit/Backups/Archiving/BackupPurpose.swift
+index 9d82841..d82adf6 100644
+--- a/SignalServiceKit/Backups/Archiving/BackupPurpose.swift
++++ b/SignalServiceKit/Backups/Archiving/BackupPurpose.swift
+@@ -164,6 +164,9 @@ extension BackupImportSource {
+         nonceStore: BackupNonceMetadataStore,
+         logger: PrefixedLogger,
+     ) async throws -> BackupForwardSecrecyToken {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            throw OWSGenericError("Cloud backup recovery is unavailable in the private demo.")
++        }
+         let svrBAuth = try await backupRequestManager.fetchSVRBAuthCredential(
+             key: key,
+             chatServiceAuth: chatAuth,
+@@ -301,6 +304,10 @@ extension BackupExportPurpose {
+         libsignalNet: LibSignalClient.Net,
+         nonceStore: BackupNonceMetadataStore,
+     ) async throws -> EncryptionMetadata {
++        // Stop before libsignal's unsupported local-demo SVRB chain constructor.
++        guard TSConstants.libSignalEnv != .localDemo else {
++            throw OWSGenericError("Cloud backups are unavailable in the private demo.")
++        }
+         let svrBAuth = try await backupRequestManager.fetchSVRBAuthCredential(
+             key: key,
+             chatServiceAuth: chatAuth,
+diff --git a/SignalServiceKit/Backups/Settings/BackupSettingsStore.swift b/SignalServiceKit/Backups/Settings/BackupSettingsStore.swift
+index dbf9517..b347a0e 100644
+--- a/SignalServiceKit/Backups/Settings/BackupSettingsStore.swift
++++ b/SignalServiceKit/Backups/Settings/BackupSettingsStore.swift
+@@ -139,6 +139,7 @@ public struct BackupSettingsStore {
+     /// w.r.t server state; for example, if the user's `.paid` Backup plan has
+     /// expired, but the client hasn't yet learned that fact.
+     public func backupPlan(tx: DBReadTransaction) -> BackupPlan {
++        guard TSConstants.libSignalEnv != .localDemo else { return .disabled }
+         if let rawValue = kvStore.getInt(Keys.plan, transaction: tx) {
+             return BackupPlan(rawValue: rawValue) ?? .disabled
+         }
+@@ -152,6 +153,7 @@ public struct BackupSettingsStore {
+     /// Callers should prefer the API on `BackupPlanManager`, or have considered
+     /// the consequences of avoiding the side-effects of setting `BackupPlan`.
+     public func setBackupPlan(_ newBackupPlan: BackupPlan, tx: DBWriteTransaction) {
++        guard TSConstants.libSignalEnv != .localDemo else { return }
+         kvStore.setBool(true, key: Keys.haveEverBeenEnabled, transaction: tx)
+         kvStore.setInt(newBackupPlan.rawValue, key: Keys.plan, transaction: tx)
+     }
+diff --git a/SignalServiceKit/Concurrency/TSMutex.swift b/SignalServiceKit/Concurrency/TSMutex.swift
+index ce6ac47..499860d 100644
+--- a/SignalServiceKit/Concurrency/TSMutex.swift
++++ b/SignalServiceKit/Concurrency/TSMutex.swift
+@@ -3,9 +3,8 @@
+ // SPDX-License-Identifier: AGPL-3.0-only
+ //
+ 
+-internal import os.lock
++public import os
+ 
+-@available(iOS, obsoleted: 16.0, message: "Use OSAllocatedUnfairLock instead.")
+ public typealias UnfairLock = TSMutex<Void>
+ 
+ /// A wrapper around os_unfair_lock to contain the memory management required to properly handle
+@@ -15,8 +14,8 @@ public typealias UnfairLock = TSMutex<Void>
+ ///
+ /// > Warning: Errors with unfair lock are fatal and will terminate the process.
+ ///
+-/// > Note: To be replaced with OSAllocatedUnfairLock once our underlying iOS version is ≥ 16.
+-@available(iOS, obsoleted: 16.0, message: "Use OSAllocatedUnfairLock instead.")
++/// This fork preserves upstream's lock API and stable allocation while targeting iOS 16.
++/// The former iOS 16 obsoletion was a migration marker, not an OS API restriction.
+ @safe
+ public final class TSMutex<State: ~Copyable>: Sendable {
+     @usableFromInline
+diff --git a/SignalServiceKit/Environment/AppSetup.swift b/SignalServiceKit/Environment/AppSetup.swift
+index 3f1d19e..dc3fc97 100644
+--- a/SignalServiceKit/Environment/AppSetup.swift
++++ b/SignalServiceKit/Environment/AppSetup.swift
+@@ -180,7 +180,7 @@ extension AppSetup.GlobalsContinuation {
+         currentCallProvider: any CurrentCallProvider,
+         notificationPresenter: any NotificationPresenter,
+         testDependencies: AppSetup.TestDependencies = AppSetup.TestDependencies(),
+-    ) -> AppSetup.DataMigrationContinuation {
++    ) throws(SigDemoDeploymentBinding.ValidationError) -> AppSetup.DataMigrationContinuation {
+         configureUnsatisfiableConstraintLogging()
+ 
+         // Order matters here.
+@@ -211,17 +211,31 @@ extension AppSetup.GlobalsContinuation {
+         )
+ 
+         let remoteConfigProvider = RemoteConfigProviderImpl(tsAccountManager: tsAccountManager)
+-        let remoteConfig = databaseStorage.read { tx in
++        let (remoteConfig, validDeployment) = databaseStorage.read { tx in
+             tsAccountManager.warmCaches(tx: tx)
+-            return remoteConfigProvider.warmCaches(tx: tx)
++            let validDeployment = (try? SigDemoDeploymentBinding.validate(
++                accountID: tsAccountManager.localIdentifiers(tx: tx)?.aci.serviceIdUppercaseString, tx: tx
++            )) != nil
++            return (remoteConfigProvider.warmCaches(tx: tx), validDeployment)
+         }
++        guard validDeployment else { throw .missingOrMismatchedBinding }
+ 
+-        let libsignalNet = Net(
+-            env: TSConstants.isUsingProductionService ? .production : .staging,
+-            userAgent: HttpHeaders.userAgentHeaderValueSignalIos,
+-            buildVariant: BuildFlags.netBuildVariant,
+-            remoteConfig: remoteConfig.netConfig(),
+-        )
++        let libsignalNet: Net
++        do {
++            guard let port = URL(string: TSConstants.mainServiceURL)?.port,
++                  let chatPort = UInt16(exactly: port), chatPort != 0 else {
++                fatalError("Invalid private demo chat transport.")
++            }
++            libsignalNet = try Net(
++                localDemoChatPort: chatPort,
++                rootCertificateDer: TSConstantsSigDemo.certificateDer,
++                userAgent: HttpHeaders.userAgentHeaderValueSignalIos,
++                buildVariant: BuildFlags.netBuildVariant,
++                remoteConfig: remoteConfig.netConfig(),
++            )
++        } catch {
++            fatalError("The isolated private demo transport could not start.")
++        }
+ 
+         let cron = Cron(
+             appVersion: appVersion.currentAppVersion4,
+diff --git a/SignalServiceKit/Environment/TSConstants.swift b/SignalServiceKit/Environment/TSConstants.swift
+index 3657ee8..d1f3819 100644
+--- a/SignalServiceKit/Environment/TSConstants.swift
++++ b/SignalServiceKit/Environment/TSConstants.swift
+@@ -10,30 +10,8 @@ public import LibSignalClient
+ 
+ public class TSConstants {
+ 
+-    private enum Environment {
+-        case production
+-        case staging
+-    }
+-
+-    private static let environment: Environment = {
+-// You can set "USE_STAGING=1" in your Xcode Scheme. This allows you to
+-// prepare a series of commits without accidentally committing the change
+-// to the environment.
+-#if DEBUG
+-        if ProcessInfo.processInfo.environment["USE_STAGING"] == "1" {
+-            return .staging
+-        }
+-#endif
+-
+-        // If you do want to make a build that will always connect to staging,
+-        // change this value. (Scheme environment variables are only set when
+-        // launching via Xcode, so this approach is still quite useful.)
+-        return .production
+-    }()
+-
+-    public static var isUsingProductionService: Bool {
+-        return environment == .production
+-    }
++    // This fork has no production/staging environment switch.
++    public static var isUsingProductionService: Bool { false }
+ 
+     // Never instantiate this class.
+     private init() {}
+@@ -80,23 +58,12 @@ public class TSConstants {
+     public static var backupServerPublicParamsData: Data { shared.backupServerPublicParamsData }
+     public static func backupServerPublicParams() -> GenericServerPublicParams { shared.backupServerPublicParams() }
+ 
+-    public static let shared: TSConstantsProtocol = {
+-        switch environment {
+-        case .production:
+-            return TSConstantsProduction()
+-        case .staging:
+-            return TSConstantsStaging()
+-        }
+-    }()
++    public static let shared: TSConstantsProtocol = TSConstantsSigDemo()
++
++    // This environment is constructed only through our private localhost/CA
++    // initializer, never through a production or staging service constructor.
++    public static let libSignalEnv: Net.Environment = .localDemo
+ 
+-    public static let libSignalEnv: Net.Environment = {
+-        switch environment {
+-        case .production:
+-            return .production
+-        case .staging:
+-            return .staging
+-        }
+-    }()
+ }
+ 
+ // MARK: -
+@@ -345,3 +312,98 @@ public class TSConstantsMock: TSConstantsProtocol {
+ }
+ 
+ #endif
++
++// MARK: - Isolated sig demo backend
++
++// Generated from the desktop's public client configuration by prepare-upstream.
++// This is deliberately embedded in SignalServiceKit, which is shared by the
++// app, share extension, and notification service extension. No invites, wallet
++// seeds, inference credentials, or server private keys belong in this payload.
++public enum SigDemoRuntimeConfiguration {
++    private static let embedded = "__SIG_DEMO_CLIENT_CONFIGURATION_BASE64__"
++
++    public static var publicClientConfigurationData: Data {
++        guard let data = Data(base64Encoded: embedded) else {
++            fatalError("The private demo configuration is invalid.")
++        }
++        return data
++    }
++
++    private static let client: [String: Any] = {
++        guard let data = Data(base64Encoded: embedded),
++              let client = try? JSONSerialization.jsonObject(with: data) as? [String: Any]
++        else { fatalError("An explicit isolated sig demo backend is required.") }
++        return client
++    }()
++
++    static func string(_ key: String) -> String {
++        guard let value = client[key] as? String, !value.isEmpty else {
++            fatalError("Missing sig demo public configuration: \(key)")
++        }
++        return value
++    }
++
++    static func data(_ key: String) -> Data {
++        guard let value = Data(base64Encoded: string(key)), !value.isEmpty else {
++            fatalError("Invalid sig demo public parameters: \(key)")
++        }
++        return value
++    }
++
++    static let trustRoots: [String] = {
++        guard let roots = client["serverTrustRoots"] as? [String], !roots.isEmpty else {
++            fatalError("Missing private sig demo trust roots.")
++        }
++        return roots
++    }()
++
++    static func cdn(_ index: String) -> String {
++        guard let cdn = client["cdn"] as? [String: String], let value = cdn[index] else {
++            fatalError("Missing private sig demo CDN endpoint.")
++        }
++        return value
++    }
++
++    static var certificateDer: Data {
++        let pem = string("certificateAuthority")
++        let base64 = pem.components(separatedBy: .newlines)
++            .filter { !$0.hasPrefix("-----") }.joined()
++        guard let data = Data(base64Encoded: base64), !data.isEmpty else {
++            fatalError("Invalid private sig demo certificate.")
++        }
++        return data
++    }
++}
++
++public final class TSConstantsSigDemo: TSConstantsProtocol {
++    public init() {}
++    public let mainServiceURL = SigDemoRuntimeConfiguration.string("serverUrl")
++    public let textSecureCDN0ServerURL = SigDemoRuntimeConfiguration.cdn("0")
++    public let textSecureCDN2ServerURL = SigDemoRuntimeConfiguration.cdn("2")
++    public let textSecureCDN3ServerURL = SigDemoRuntimeConfiguration.cdn("3")
++    public let storageServiceURL = SigDemoRuntimeConfiguration.string("storageUrl")
++    public let sfuURL = SigDemoRuntimeConfiguration.string("sfuUrl")
++    public let sfuTestURL = SigDemoRuntimeConfiguration.string("sfuUrl")
++    public let svr2URL = SigDemoRuntimeConfiguration.string("disabledUrl")
++    public let registrationCaptchaURL = SigDemoRuntimeConfiguration.string("registrationChallengeUrl")
++    public let challengeCaptchaURL = SigDemoRuntimeConfiguration.string("challengeUrl")
++    public let kUDTrustRoots = SigDemoRuntimeConfiguration.trustRoots
++    public let updatesURL = SigDemoRuntimeConfiguration.string("updatesUrl")
++    public let updates2URL = SigDemoRuntimeConfiguration.string("resourcesUrl")
++    public let censorshipFReflectorHost = "localhost"
++    public let censorshipGReflectorHost = "localhost"
++    public let serviceCensorshipPrefix = "disabled"
++    public let cdn0CensorshipPrefix = "disabled"
++    public let cdn2CensorshipPrefix = "disabled"
++    public let cdn3CensorshipPrefix = "disabled"
++    public let storageServiceCensorshipPrefix = "disabled"
++    public let svr2CensorshipPrefix = "disabled"
++    public let svr2Enclaves: [MrEnclave] = []
++    public let activeSvr2EnclaveCount = 0
++    public let applicationGroup = "group." + Bundle.main.bundleIdPrefix + ".signal.group"
++    public let serverPublicParamsData = SigDemoRuntimeConfiguration.data("serverPublicParams")
++    public let callLinkPublicParamsData = SigDemoRuntimeConfiguration.data("genericServerPublicParams")
++    public let backupServerPublicParamsData = SigDemoRuntimeConfiguration.data("backupServerPublicParams")
++
++    static var certificateDer: Data { SigDemoRuntimeConfiguration.certificateDer }
++}
+diff --git a/SignalServiceKit/Messages/Interactions/TSMessage.h b/SignalServiceKit/Messages/Interactions/TSMessage.h
+index dcf2ca0..ae307fe 100644
+--- a/SignalServiceKit/Messages/Interactions/TSMessage.h
++++ b/SignalServiceKit/Messages/Interactions/TSMessage.h
+@@ -228,6 +228,9 @@ NS_DESIGNATED_INITIALIZER NS_SWIFT_NAME(init(grdbId:uniqueId:receivedAtTimestamp
+ 
+ #endif
+ 
++// Updates the cumulative reply row owned by the isolated sig demo frame handler.
++- (void)sigDemoUpdateBody:(NSString *)body transaction:(DBWriteTransaction *)transaction NS_SWIFT_NAME(sigDemoUpdateBody(_:tx:));
++
+ #pragma mark - View Once
+ 
+ - (void)updateWithViewOnceCompleteAndRemoveRenderableContentWithTransaction:(DBWriteTransaction *)transaction;
+diff --git a/SignalServiceKit/Messages/Interactions/TSMessage.m b/SignalServiceKit/Messages/Interactions/TSMessage.m
+index d3c7af6..bebdba9 100644
+--- a/SignalServiceKit/Messages/Interactions/TSMessage.m
++++ b/SignalServiceKit/Messages/Interactions/TSMessage.m
+@@ -661,6 +661,14 @@ static const NSUInteger OWSMessageSchemaVersion = 4;
+ 
+ #endif
+ 
++- (void)sigDemoUpdateBody:(NSString *)body transaction:(DBWriteTransaction *)transaction
++{
++    if (![[NSBundle.mainBundle objectForInfoDictionaryKey:@"OWSBundleIDPrefix"] isEqual:@"dev.matbalez.sig-demo.ios"]) {
++        return;
++    }
++    [self anyUpdateMessageWithTransaction:transaction block:^(TSMessage *message) { message.body = body; }];
++}
++
+ #pragma mark - View Once
+ 
+ - (void)updateWithViewOnceCompleteAndRemoveRenderableContentWithTransaction:(DBWriteTransaction *)transaction
+diff --git a/SignalServiceKit/Messages/MessageReceiver.swift b/SignalServiceKit/Messages/MessageReceiver.swift
+index 6ecfff4..f7010cd 100644
+--- a/SignalServiceKit/Messages/MessageReceiver.swift
++++ b/SignalServiceKit/Messages/MessageReceiver.swift
+@@ -1274,6 +1274,16 @@ public final class MessageReceiver {
+             return nil
+         }
+ 
++        // This runs only after normal sender/group and visible-message checks.
++        switch SigDemoAgentFrame.decodeUnknownFields(dataMessage.unknownFields?.data ?? Data()) {
++        case .frame(let frame):
++            return SigDemoAgentMessages.apply(frame, thread: thread, origin: envelope.sourceAci,
++                expiresInSeconds: dataMessage.expireTimer,
++                expireTimerVersion: dataMessage.hasExpireTimerVersion ? dataMessage.expireTimerVersion : nil, tx: tx)
++        case .invalid: return nil
++        case .absent: break
++        }
++
+         if let groupCallUpdate = dataMessage.groupCallUpdate {
+             guard let groupId = try? (thread as? TSGroupThread)?.groupIdentifier else {
+                 Logger.warn("Ignoring group call update invalid group thread.")
+diff --git a/SignalServiceKit/Messages/Stories/SystemStoryManager.swift b/SignalServiceKit/Messages/Stories/SystemStoryManager.swift
+index d4d2e36..600089c 100644
+--- a/SignalServiceKit/Messages/Stories/SystemStoryManager.swift
++++ b/SignalServiceKit/Messages/Stories/SystemStoryManager.swift
+@@ -531,7 +531,7 @@ public class SystemStoryManager: SystemStoryManagerProtocol {
+     ) async throws -> [String] {
+         let response = try await urlSession.performRequest(Constants.manifestPath, method: .get, maxResponseSize: .max)
+         let manifest = try JSONDecoder().decode(StoryManifest.self, from: response.responseBodyData ?? Data())
+-        let filenames = try manifest.filenames(for: Locale.current.languageCode, or: Constants.fallbackLanguageCode)
++        let filenames = try manifest.filenames(for: Locale.current.language.languageCode?.identifier, or: Constants.fallbackLanguageCode)
+         return filenames.map {
+             return Constants.imagePath(version: manifest.version, filename: $0)
+         }
+diff --git a/SignalServiceKit/Network/API/NetworkManager.swift b/SignalServiceKit/Network/API/NetworkManager.swift
+index 160ce84..aebe69a 100644
+--- a/SignalServiceKit/Network/API/NetworkManager.swift
++++ b/SignalServiceKit/Network/API/NetworkManager.swift
+@@ -77,25 +77,8 @@ public class NetworkManager: NetworkManagerProtocol {
+     }
+ 
+     private static func resetLibsignalNetProxySettings(_ libsignalNet: Net, appReadiness: AppReadiness) {
+-        guard !SignalProxy.isEnabled else {
+-            // Don't stomp on in-app proxy settings, which are managed by SignalProxy.
+-            return
+-        }
+-
+-        if let systemProxy = ProxyConfig.fromCFNetwork() {
+-            Logger.info("System '\(systemProxy.scheme)' proxy detected")
+-            do {
+-                try libsignalNet.setProxy(scheme: systemProxy.scheme, host: systemProxy.host, port: systemProxy.port, username: systemProxy.username, password: systemProxy.password)
+-                return
+-            } catch {
+-                Logger.error("invalid proxy: \(error)")
+-                // When setProxy(...) fails, it refuses to connect in case your proxy was load-bearing.
+-                // That makes sense for in-app settings, but less so for system-level proxies, given that we are already ignoring system-level proxies we don't understand.
+-                // Fall through to the reset call.
+-            }
+-        }
+-
+-        // This may be clearing a system proxy, or a previously set in-app proxy that is no longer in use.
++        // This Net was constructed with a localhost-only environment and a
++        // private CA. Resetting its proxy cannot select a public Signal service.
+         libsignalNet.clearProxy()
+     }
+ 
+diff --git a/SignalServiceKit/Network/HttpSecurityPolicy.swift b/SignalServiceKit/Network/HttpSecurityPolicy.swift
+index 16b96ea..1d2fa62 100644
+--- a/SignalServiceKit/Network/HttpSecurityPolicy.swift
++++ b/SignalServiceKit/Network/HttpSecurityPolicy.swift
+@@ -7,7 +7,12 @@ import Security
+ 
+ /// A simplified version of AFNetworking's AFSecurityPolicy.
+ public struct HttpSecurityPolicy {
+-    public static let signalCaPinned: HttpSecurityPolicy = .init(pinnedCertificates: [Certificates.load("signal-messenger", extension: "cer")])
++    public static let signalCaPinned: HttpSecurityPolicy = {
++        guard let certificate = SecCertificateCreateWithData(nil, TSConstantsSigDemo.certificateDer as CFData) else {
++            fatalError("The private sig demo certificate could not be loaded.")
++        }
++        return .init(pinnedCertificates: [certificate])
++    }()
+     public static let systemDefault: HttpSecurityPolicy = .init()
+ 
+     private let pinnedCertificates: [SecCertificate]?
+diff --git a/SignalServiceKit/Network/OWSUrlSession.swift b/SignalServiceKit/Network/OWSUrlSession.swift
+index 384f690..1803c74 100644
+--- a/SignalServiceKit/Network/OWSUrlSession.swift
++++ b/SignalServiceKit/Network/OWSUrlSession.swift
+@@ -151,6 +151,15 @@ public class OWSURLSession: OWSURLSessionProtocol {
+         )
+     }
+ 
++    // HTTP services for this fork are restricted to the configured local TLS
++    // relay. Agent inference/search use their own explicit Rust providers.
++    private static func isPrivateDemoEndpoint(_ url: URL?) -> Bool {
++        guard let url, let configured = URL(string: TSConstants.mainServiceURL) else { return false }
++        return (url.scheme == "https" || url.scheme == "wss")
++            && url.host == "localhost" && url.host == configured.host
++            && url.port == configured.port && url.user == nil && url.password == nil
++    }
++
+     // MARK: Tasks
+ 
+     public func performUpload(
+@@ -236,6 +245,7 @@ public class OWSURLSession: OWSURLSessionProtocol {
+     }
+ 
+     public func webSocketTask(requestUrl: URL, didOpenBlock: @escaping (String?) -> Void, didCloseBlock: @escaping (Error) -> Void) -> URLSessionWebSocketTask {
++        precondition(Self.isPrivateDemoEndpoint(requestUrl), "sig demo blocks upstream service sockets.")
+         // We can't pass a URLRequest here since it prevents the proxy from
+         // operating correctly. See `SSKWebSocketNative.init(...)` for more details
+         // and an example of passing URLRequest options via this web socket.
+@@ -536,6 +546,9 @@ public class OWSURLSession: OWSURLSessionProtocol {
+         progressBlock: ProgressBlock,
+         cancelBlock: ((U) -> Void),
+     ) async throws -> T {
++        guard let url = task.originalRequest?.url, Self.isPrivateDemoEndpoint(url) else {
++            throw URLError(.unsupportedURL)
++        }
+         // It's possible for operation and onCancel to race one another, so we use
+         // a counter to ensure that cancellation happens after addTask is invoked.
+         // (You can trigger this by sending a request from a canceled Task.)
+@@ -740,10 +753,13 @@ extension OWSURLSession {
+         newRequest: URLRequest,
+         completionHandler: @escaping (URLRequest?) -> Void,
+     ) {
++        guard Self.isPrivateDemoEndpoint(newRequest.url) else { return completionHandler(nil) }
+         guard allowRedirects else { return completionHandler(nil) }
+ 
+         if let customRedirectHandler {
+-            completionHandler(customRedirectHandler(newRequest))
++            let redirected = customRedirectHandler(newRequest)
++            guard Self.isPrivateDemoEndpoint(redirected?.url) else { return completionHandler(nil) }
++            completionHandler(redirected)
+         } else {
+             completionHandler(newRequest)
+         }
+diff --git a/SignalServiceKit/Network/SignalProxy/SignalProxy.swift b/SignalServiceKit/Network/SignalProxy/SignalProxy.swift
+index e386430..d4ce211 100644
+--- a/SignalServiceKit/Network/SignalProxy/SignalProxy.swift
++++ b/SignalServiceKit/Network/SignalProxy/SignalProxy.swift
+@@ -143,27 +143,8 @@ public class SignalProxy: NSObject {
+     }
+ 
+     private static func updateLibSignalProxy() {
+-        let networkManager = SSKEnvironment.shared.networkManagerRef
+-        if isEnabled {
+-            if let (proxyHost, proxyPort) = host.flatMap({ ProxyClient.parseHost($0) }) {
+-                if let libsignalNet = networkManager.libsignalNet {
+-                    Logger.info("Applying signal proxy settings to libsignal Net.")
+-                    do {
+-                        try libsignalNet.setProxy(host: proxyHost, port: proxyPort)
+-                        Logger.info("Applied signal proxy settings to libsignal Net.")
+-                    } catch {
+-                        owsFailDebug("failed to set proxy on libsignal-net (need better validation)")
+-                        // This will poison the Net instance, failing all new connections,
+-                        // until a valid proxy is set or cleared.
+-                    }
+-                }
+-            } else {
+-                // We can't print the invalid host in the logs, because that's private!
+-                owsFailDebug("failed to parse previously-validated proxy host")
+-            }
+-        } else {
+-            networkManager.resetLibsignalNetProxySettings()
+-        }
++        // A user proxy must not make the disabled production/staging Net usable.
++        SSKEnvironment.shared.networkManagerRef.libsignalNet?.clearProxy()
+     }
+ 
+     public class func startRelayServer() {
+diff --git a/SignalServiceKit/SecureValueRecovery/SecureValueRecovery2Impl.swift b/SignalServiceKit/SecureValueRecovery/SecureValueRecovery2Impl.swift
+index fef7b81..c866848 100644
+--- a/SignalServiceKit/SecureValueRecovery/SecureValueRecovery2Impl.swift
++++ b/SignalServiceKit/SecureValueRecovery/SecureValueRecovery2Impl.swift
+@@ -47,6 +47,7 @@ public class SecureValueRecovery2Impl: SecureValueRecovery {
+     // MARK: - Periodic Backups
+ 
+     public func refreshCredentialsIfNecessary() async throws {
++        guard TSConstants.libSignalEnv != .localDemo else { return }
+         let shouldBeBackedUp = self.db.read { tx in self.twoFAManager.shouldMasterKeyBeBackedUp(tx: tx) }
+         guard shouldBeBackedUp else {
+             // If we've never backed up, don't refresh periodically. (If we eventually
+@@ -72,6 +73,9 @@ public class SecureValueRecovery2Impl: SecureValueRecovery {
+     private let backupQueue = ConcurrentTaskQueue(concurrentLimit: 1)
+ 
+     public func backUpMasterKey(pin: String, masterKey: MasterKey, authMethod: SVR.AuthMethod) async throws {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            throw OWSGenericError("Signal PIN recovery is unavailable in the private demo.")
++        }
+         Logger.info("")
+         try await backupQueue.runWithThrowingTask {
+             try await doBackupAndExpose(pin: pin, masterKey: masterKey, authMethod: authMethod)
+@@ -79,6 +83,9 @@ public class SecureValueRecovery2Impl: SecureValueRecovery {
+     }
+ 
+     public func restoreKeys(pin: String, authMethod: SVR.AuthMethod) async -> SVR.RestoreKeysResult {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            return .genericError(OWSGenericError("Signal PIN recovery is unavailable in the private demo."))
++        }
+         Logger.info("")
+         // When we restore, we remember which enclave it was from. On some future app startup, we check
+         // this enclave, and migrate to a new one if available. This code path relies on that happening
+@@ -591,6 +598,8 @@ public class SecureValueRecovery2Impl: SecureValueRecovery {
+     // MARK: - Migrations
+ 
+     public func refreshBackupIfNecessary() async throws {
++        // Private accounts have no SVR enclave set, including no legacy enclaves to prune.
++        guard TSConstants.libSignalEnv != .localDemo else { return }
+         try await backupQueue.runWithThrowingTask {
+             let pin = db.read(block: twoFAManager.pinCode(transaction:))
+ 
+diff --git a/SignalServiceKit/Storage/Database/GRDBSchemaMigrator.swift b/SignalServiceKit/Storage/Database/GRDBSchemaMigrator.swift
+index 1d83f6a..32f6277 100644
+--- a/SignalServiceKit/Storage/Database/GRDBSchemaMigrator.swift
++++ b/SignalServiceKit/Storage/Database/GRDBSchemaMigrator.swift
+@@ -7998,6 +7998,9 @@ public class GRDBSchemaMigrator {
+     }
+ 
+     static func migrateSecureValueRecovery(tx: DBWriteTransaction) throws {
++        // Isolated invite accounts have no production/staging SVR history.
++        // This legacy enclave migration does not apply to the private environment.
++        guard TSConstants.libSignalEnv != .localDemo else { return }
+         // When this causes a unit test to fail, pre-migration enclaves have been
+         // torn down, and we don't need to delete anything from them. We should
+         // delete the `do` block that follows at that point in time.
+diff --git a/SignalServiceKit/Storage/SSKKeychainStorage.swift b/SignalServiceKit/Storage/SSKKeychainStorage.swift
+index 5d78fe2..4c33b7a 100644
+--- a/SignalServiceKit/Storage/SSKKeychainStorage.swift
++++ b/SignalServiceKit/Storage/SSKKeychainStorage.swift
+@@ -40,7 +40,7 @@ public class KeychainStorageImpl: KeychainStorage {
+     }
+ 
+     private func normalizeService(_ service: String) -> String {
+-        return self.isUsingProductionService ? service : service + ".staging"
++        return "dev.matbalez.sig-demo.ios." + service
+     }
+ 
+     private func baseQuery(service: String, key: String) -> [String: Any] {
+diff --git a/SignalServiceKit/StorageService/StorageServiceManager.swift b/SignalServiceKit/StorageService/StorageServiceManager.swift
+index 56aab19..359d53d 100644
+--- a/SignalServiceKit/StorageService/StorageServiceManager.swift
++++ b/SignalServiceKit/StorageService/StorageServiceManager.swift
+@@ -144,7 +144,7 @@ public class StorageServiceManagerImpl: NSObject, StorageServiceManager {
+         self.appReadiness = appReadiness
+         super.init()
+ 
+-        if CurrentAppContext().isMainApp {
++        if CurrentAppContext().isMainApp && TSConstants.libSignalEnv != .localDemo {
+             appReadiness.runNowOrWhenAppWillBecomeReady {
+                 self.cleanUpUnknownData()
+             }
+@@ -183,6 +183,7 @@ public class StorageServiceManagerImpl: NSObject, StorageServiceManager {
+     private static let restoreManifestCronInterval: TimeInterval = .day
+ 
+     public func registerForCron(_ cron: Cron) {
++        guard TSConstants.libSignalEnv != .localDemo else { return }
+         cron.schedulePeriodically(
+             uniqueKey: Self.restoreManifestCronKey,
+             approximateInterval: Self.restoreManifestCronInterval,
+@@ -501,6 +502,7 @@ public class StorageServiceManagerImpl: NSObject, StorageServiceManager {
+     // MARK: - Pending Mutations
+ 
+     private func updatePendingMutations(block: (inout PendingMutations) -> Void) {
++        guard TSConstants.libSignalEnv != .localDemo else { return }
+         updateManagerState { managerState in
+             block(&managerState.pendingMutations)
+ 
+@@ -575,6 +577,9 @@ public class StorageServiceManagerImpl: NSObject, StorageServiceManager {
+         masterKeySource: StorageService.MasterKeySource,
+         isRunningViaCron: Bool,
+     ) async throws {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            throw OWSGenericError("Cloud account restore is unavailable in the private demo.")
++        }
+         let continuation = CancellableContinuation<Void>()
+         updateManagerState { managerState in
+             var pendingRestore = managerState.pendingRestore ?? .init(
+@@ -596,6 +601,9 @@ public class StorageServiceManagerImpl: NSObject, StorageServiceManager {
+         mode: ManifestRotationMode,
+         authedAccount: AuthedAccount,
+     ) async throws {
++        guard TSConstants.libSignalEnv != .localDemo else {
++            throw OWSGenericError("Cloud account backup is unavailable in the private demo.")
++        }
+         try await withCheckedThrowingContinuation { continuation in
+             updateManagerState { managerState in
+                 var pendingRotation = managerState.pendingManifestRotation ?? .init(
+@@ -614,6 +622,7 @@ public class StorageServiceManagerImpl: NSObject, StorageServiceManager {
+     }
+ 
+     public func backupPendingChanges(authedAccount: AuthedAccount) {
++        guard TSConstants.libSignalEnv != .localDemo else { return }
+         updateManagerState { managerState in
+             var pendingBackup = managerState.pendingBackup ?? .init(authedAccount: .implicit, masterKeySource: .implicit)
+             pendingBackup.authedAccount = authedAccount.orIfImplicitUse(pendingBackup.authedAccount)
+diff --git a/SignalServiceKit/TestUtils/MockSSKEnvironment.swift b/SignalServiceKit/TestUtils/MockSSKEnvironment.swift
+index f5496ee..b090eaf 100644
+--- a/SignalServiceKit/TestUtils/MockSSKEnvironment.swift
++++ b/SignalServiceKit/TestUtils/MockSSKEnvironment.swift
+@@ -66,7 +66,7 @@ public class MockSSKEnvironment {
+             keychainStorage = MockKeychainStorage()
+         }
+ 
+-        let finalContinuation = await AppSetup().start(
++        let finalContinuation = try! await AppSetup().start(
+             appContext: testAppContext,
+             databaseStorage: try! SDSDatabaseStorage(
+                 appReadiness: appReadiness,
+diff --git a/SignalServiceKit/Util/Bundle+OWS.swift b/SignalServiceKit/Util/Bundle+OWS.swift
+index 51292e9..674355c 100644
+--- a/SignalServiceKit/Util/Bundle+OWS.swift
++++ b/SignalServiceKit/Util/Bundle+OWS.swift
+@@ -24,7 +24,7 @@ extension Bundle {
+             return prefix
+         } else {
+             owsFailDebug("Missing Info.plist entry for OWSBundleIDPrefix")
+-            return "org.whispersystems"
++            return "dev.matbalez.sig-demo.ios"
+         }
+     }
+ 
+@@ -34,7 +34,7 @@ extension Bundle {
+             return prefix
+         } else {
+             owsFailDebug("Missing Info.plist entry for OWSMerchantID")
+-            return "org.signalfoundation"
++            return "dev.matbalez.sig-demo.ios.disabled"
+         }
+     }
+ }
+diff --git a/SignalShareExtension/Info.plist b/SignalShareExtension/Info.plist
+index 631a181..9462aed 100644
+--- a/SignalShareExtension/Info.plist
++++ b/SignalShareExtension/Info.plist
+@@ -88,7 +88,7 @@
+ 	<key>OWSBundleIDPrefix</key>
+ 	<string>$(SIGNAL_BUNDLEID_PREFIX)</string>
+ 	<key>OWSMerchantID</key>
+-	<string>$(SIGNAL_MERCHANTID)</string>
++	<string>dev.matbalez.sig-demo.ios.disabled</string>
+ 	<key>UIStatusBarStyle</key>
+ 	<string>UIStatusBarStyleLightContent</string>
+ 	<key>UIViewControllerBasedStatusBarAppearance</key>
+diff --git a/SignalShareExtension/ShareViewController.swift b/SignalShareExtension/ShareViewController.swift
+index a9af3e6..5e48350 100644
+--- a/SignalShareExtension/ShareViewController.swift
++++ b/SignalShareExtension/ShareViewController.swift
+@@ -63,6 +63,12 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate {
+                 Task {
+                     do {
+                         try await self.setUp(initialLoadViewController: initialLoadViewController)
++                    } catch is SigDemoDeploymentBinding.ValidationError {
++                        self.showBlockingView(AppBlockingViewController(
++                            headerImage: UIImage(named: "signal-logo-128-launch-screen")!,
++                            title: "Separate test account required",
++                            subtitle: "Open the original demo build, or use a fresh installation to join this demo."
++                        ))
+                     } catch {
+                         Logger.error("Unable to setup ShareViewController \(error)")
+                     }
+@@ -95,7 +101,7 @@ public class ShareViewController: OWSNavigationController, ShareViewDelegate {
+         }
+         databaseStorage.grdbStorage.setUpDatabasePathKVO()
+ 
+-        let databaseContinuation = await AppSetup()
++        let databaseContinuation = try await AppSetup()
+             .start(
+                 appContext: appContext,
+                 databaseStorage: databaseStorage,
+diff --git a/SignalUI/Sending/ThreadUtil+SignalUI.swift b/SignalUI/Sending/ThreadUtil+SignalUI.swift
+index 27a86cd..eb65b92 100644
+--- a/SignalUI/Sending/ThreadUtil+SignalUI.swift
++++ b/SignalUI/Sending/ThreadUtil+SignalUI.swift
+@@ -61,6 +61,7 @@ extension ThreadUtil {
+                 benchEventId: benchEventId,
+                 thread: thread,
+                 persistenceCompletionHandler: persistenceCompletion,
++                sigDemoInvoke: true,
+             )
+         }
+     }
+@@ -135,6 +136,7 @@ extension ThreadUtil {
+         benchEventId: String,
+         thread: TSThread,
+         persistenceCompletionHandler persistenceCompletion: PersistenceCompletion? = nil,
++        sigDemoInvoke: Bool = false,
+     ) async {
+         await SSKEnvironment.shared.databaseStorageRef.awaitableWrite { writeTransaction in
+             guard let preparedMessage = try? unpreparedMessage.prepare(tx: writeTransaction) else {
+@@ -157,6 +159,15 @@ extension ThreadUtil {
+                 BenchEventComplete(eventId: benchEventId)
+             }
+ 
++            if sigDemoInvoke, let message = preparedMessage.messageForIntentDonation(tx: writeTransaction),
++               SigDemoAgentFrame.prompt(in: message.rawBody(transaction: writeTransaction)) != nil {
++                let id = message.uniqueId
++                writeTransaction.addSyncCompletion {
++                    NotificationCenter.default.post(name: SigDemoAgentMessages.didPersistLocalMessage,
++                        object: nil, userInfo: ["messageId": id])
++                }
++            }
++
+             if
+                 let messageForIntent = preparedMessage.messageForIntentDonation(tx: writeTransaction),
+                 let thread = messageForIntent.thread(tx: writeTransaction)
+diff --git a/SignalUI/Views/BodyRanges/BodyRangesTextView.swift b/SignalUI/Views/BodyRanges/BodyRangesTextView.swift
+index 5f0081f..5b6f97e 100644
+--- a/SignalUI/Views/BodyRanges/BodyRangesTextView.swift
++++ b/SignalUI/Views/BodyRanges/BodyRangesTextView.swift
+@@ -7,6 +7,7 @@ public import LibSignalClient
+ public import SignalServiceKit
+ 
+ public protocol BodyRangesTextViewDelegate: UITextViewDelegate {
++    var offersSigAssistantMention: Bool { get }
+     func textViewDidBeginTypingMention(_ textView: BodyRangesTextView)
+     func textViewDidEndTypingMention(_ textView: BodyRangesTextView)
+ 
+@@ -24,6 +25,7 @@ public protocol BodyRangesTextViewDelegate: UITextViewDelegate {
+ }
+ 
+ extension BodyRangesTextViewDelegate {
++    public var offersSigAssistantMention: Bool { false }
+     public func textViewDidInsertMemoji(_ memojiGlyph: OWSAdaptiveImageGlyph) {}
+ }
+ 
+@@ -148,6 +150,20 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate, UITextV
+         )
+     }
+ 
++    private func insertSigAssistantMention() {
++        guard case .typingMention(let typedRange) = state else { return }
++        let range = NSRange(location: typedRange.location - 1, length: typedRange.length + 1)
++        let body = editableBody.hydratedPlaintext as NSString
++        let followingSpace = range.upperBound < body.length && body.character(at: range.upperBound) == 0x20
++        let replacement = followingSpace ? "@sig" : "@sig "
++        editableBody.beginEditing()
++        editableBody.replaceCharacters(in: range, with: replacement, selectedRange: selectedRange)
++        editableBody.endEditing()
++        selectedRange = NSRange(location: range.location + "@sig ".utf16.count, length: 0)
++        stopTypingMention()
++        textViewDidChange(self)
++    }
++
+     public func replaceCharacters(
+         in range: NSRange,
+         withMentionAddress mentionAddress: SignalServiceAddress,
+@@ -319,11 +335,23 @@ open class BodyRangesTextView: OWSTextView, EditableMessageBodyDelegate, UITextV
+         let mentionableAcis = SSKEnvironment.shared.databaseStorageRef.read { tx in
+             return bodyRangesDelegate.textViewMentionPickerPossibleAcis(self, tx: tx)
+         }
+-        guard !mentionableAcis.isEmpty else { return }
++        // Sig's wire representation is a text token beginning at a word boundary.
++        let offersSig: Bool
++        if bodyRangesDelegate.offersSigAssistantMention, case .typingMention(let range) = state {
++            let text = editableBody.hydratedPlaintext as NSString
++            let start = range.location - 1
++            offersSig = start == 0 || text.rangeOfCharacter(
++                from: .whitespacesAndNewlines, options: [], range: NSRange(location: start - 1, length: 1),
++            ).length == 1
++        } else {
++            offersSig = false
++        }
++        guard offersSig || !mentionableAcis.isEmpty else { return }
+ 
+         let pickerView = MentionPicker(
+             mentionableAcis: mentionableAcis,
+             style: bodyRangesDelegate.mentionPickerStyle(self),
++            selectSigAssistant: offersSig ? { [weak self] in self?.insertSigAssistantMention() } : nil,
+         ) { [weak self] selectedAddress in
+             self?.insertTypedMention(address: selectedAddress)
+         }
+@@ -875,7 +903,7 @@ private enum FormatEditMenuItem: CaseIterable {
+ ///
+ /// The contents of this file were cut-pasted from `BodyRangesTextView` and
+ /// minimally adapated to accomodate being in a separate type.
+-@available(iOS, obsoleted: 16.0)
++// Retained for upstream source compatibility; initialization stays behind the iOS < 16 branch.
+ private class BodyRangesTextViewIOS15EditMenu {
+ 
+     private unowned let textView: BodyRangesTextView
+diff --git a/SignalUI/Views/BodyRanges/MentionPicker.swift b/SignalUI/Views/BodyRanges/MentionPicker.swift
+index 3d5f242..f45d9d4 100644
+--- a/SignalUI/Views/BodyRanges/MentionPicker.swift
++++ b/SignalUI/Views/BodyRanges/MentionPicker.swift
+@@ -18,15 +18,17 @@ class MentionPicker: UIView {
+     typealias Style = MentionPickerStyle
+ 
+     let style: Style
++    private let selectSigAssistant: (() -> Void)?
+     let selectedAddressCallback: (SignalServiceAddress) -> Void
+ 
+     init(
+         mentionableAcis: [Aci],
+         style: Style,
++        selectSigAssistant: (() -> Void)? = nil,
+         selectedAddressCallback: @escaping (SignalServiceAddress) -> Void,
+     ) {
+         let databaseStorage = SSKEnvironment.shared.databaseStorageRef
+-        mentionableUsers = databaseStorage.read { transaction in
++        let members: [MentionableUser] = databaseStorage.read { transaction in
+             let sortedAddresses = SSKEnvironment.shared.contactManagerImplRef.sortSignalServiceAddresses(
+                 mentionableAcis.map({ SignalServiceAddress($0) }),
+                 transaction: transaction,
+@@ -38,13 +40,15 @@ class MentionPicker: UIView {
+                     return nil
+                 }
+ 
+-                return MentionableUser(
++                return MentionableUser.member(
+                     address: address,
+                     displayName: SSKEnvironment.shared.contactManagerRef.displayName(for: address, tx: transaction).resolvedValue(),
+                 )
+             }
+         }
+ 
++        mentionableUsers = selectSigAssistant == nil ? members : [.sigAssistant] + members
++        self.selectSigAssistant = selectSigAssistant
+         self.style = style
+         self.selectedAddressCallback = selectedAddressCallback
+ 
+@@ -360,9 +364,23 @@ class MentionPicker: UIView {
+ 
+     // MARK: - User Matching
+ 
+-    struct MentionableUser {
+-        let address: SignalServiceAddress
+-        let displayName: String
++    enum MentionableUser {
++        case member(address: SignalServiceAddress, displayName: String)
++        case sigAssistant
++
++        var displayName: String {
++            switch self {
++            case .member(_, let name): return name
++            case .sigAssistant: return "Sig"
++            }
++        }
++    }
++
++    private func select(_ user: MentionableUser) {
++        switch user {
++        case .member(let address, _): selectedAddressCallback(address)
++        case .sigAssistant: selectSigAssistant?()
++        }
+     }
+ 
+     private let mentionableUsers: [MentionableUser]
+@@ -454,7 +472,7 @@ extension MentionPicker {
+         guard
+             let selectedIndex = tableView.indexPathForSelectedRow,
+             let mentionableUser = filteredMentionableUsers[safe: selectedIndex.row] else { return }
+-        selectedAddressCallback(mentionableUser.address)
++        select(mentionableUser)
+     }
+ }
+ 
+@@ -476,6 +494,18 @@ extension MentionPicker: UITableViewDelegate, UITableViewDataSource {
+     }
+ 
+     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
++        let user = filteredMentionableUsers[indexPath.row]
++        if case .sigAssistant = user {
++            let identifier = "SigAssistantMentionCell"
++            let cell = tableView.dequeueReusableCell(withIdentifier: identifier) ?? UITableViewCell(style: .default, reuseIdentifier: identifier)
++            var configuration = cell.defaultContentConfiguration()
++            configuration.text = "Sig"
++            configuration.secondaryText = "Private Assistant"
++            configuration.image = UIImage(systemName: "sparkles")
++            cell.contentConfiguration = configuration
++            cell.accessibilityIdentifier = "SigAssistantMention"
++            return cell
++        }
+         let cell = tableView.dequeueReusableCell(withIdentifier: MentionableUserCell.reuseIdentifier, for: indexPath)
+ 
+         guard let userCell = cell as? MentionableUserCell else {
+@@ -483,13 +513,10 @@ extension MentionPicker: UITableViewDelegate, UITableViewDataSource {
+             return cell
+         }
+ 
+-        guard let mentionableUser = filteredMentionableUsers[safe: indexPath.row] else {
+-            owsFailDebug("missing mentionable user")
+-            return cell
++        if case .member(let address, let displayName) = user {
++            userCell.configure(address: address, displayName: displayName)
+         }
+ 
+-        userCell.configure(with: mentionableUser, style: style)
+-
+         return userCell
+     }
+ 
+@@ -498,7 +525,7 @@ extension MentionPicker: UITableViewDelegate, UITableViewDataSource {
+             return owsFailDebug("missing mentionable user")
+         }
+ 
+-        selectedAddressCallback(mentionableUser.address)
++        select(mentionableUser)
+     }
+ }
+ 
+@@ -583,11 +610,11 @@ private class MentionableUserCell: UITableViewCell {
+         fatalError("init(coder:) has not been implemented")
+     }
+ 
+-    func configure(with mentionableUser: MentionPicker.MentionableUser, style: MentionPicker.Style) {
+-        displayNameLabel.text = mentionableUser.displayName
++    func configure(address: SignalServiceAddress, displayName: String) {
++        displayNameLabel.text = displayName
+ 
+         avatarView.updateWithSneakyTransactionIfNecessary { configuration in
+-            configuration.dataSource = .address(mentionableUser.address)
++            configuration.dataSource = .address(address)
+         }
+     }
+ }

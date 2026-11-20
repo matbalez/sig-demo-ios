@@ -1,0 +1,5 @@
+/Artifacts/
+/.build/
+/Generated/
+
+/Sources/SigDemoAgent/Generated.swift

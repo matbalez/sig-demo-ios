@@ -1,0 +1,16 @@
+.sig-demo/
+.DS_Store
+**/target/
+**/.build/
+**/.swiftpm/
+**/.xcuserdata/
+**/xcuserdata/
+**/Artifacts/
+**/Generated/
+**/*.gguf
+*.ipa
+*.xcarchive/
+*.mobileprovision
+*.p8
+*.p12
+.env*

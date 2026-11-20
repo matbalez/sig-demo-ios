@@ -1,0 +1,1 @@
+Answer the latest request directly from the conversation, your knowledge, or your reasoning when you can. If it needs outside public evidence or the user explicitly asks for a lookup, use web search now.

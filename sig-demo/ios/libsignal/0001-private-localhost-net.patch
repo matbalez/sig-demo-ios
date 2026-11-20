@@ -1,0 +1,571 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 00b4f71..07dde57 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -2633,6 +2633,7 @@ dependencies = [
+  "attest",
+  "backtrace",
+  "base64",
++ "boring",
+  "device-transfer",
+  "futures-util",
+  "hkdf",
+diff --git a/rust/bridge/shared/Cargo.toml b/rust/bridge/shared/Cargo.toml
+index 79eb71e..4a6e76c 100644
+--- a/rust/bridge/shared/Cargo.toml
++++ b/rust/bridge/shared/Cargo.toml
+@@ -36,6 +36,7 @@ aes-gcm-siv = { workspace = true }
+ async-trait = { workspace = true }
+ backtrace = { workspace = true }
+ base64 = { workspace = true }
++boring-signal = { workspace = true }
+ futures-util = { workspace = true }
+ hkdf = { workspace = true }
+ hmac = { workspace = true }
+diff --git a/rust/bridge/shared/src/net.rs b/rust/bridge/shared/src/net.rs
+index 348fefb..343f6a5 100644
+--- a/rust/bridge/shared/src/net.rs
++++ b/rust/bridge/shared/src/net.rs
+@@ -21,6 +21,7 @@ use crate::*;
+ pub(crate) mod cdsi;
+ pub(crate) mod chat;
+ mod keytrans;
++mod local_demo;
+ mod registration;
+ mod svr2;
+ mod svrb;
+@@ -108,6 +109,33 @@ fn ConnectionManager_new(
+     )
+ }
+ 
++/// Create a private localhost-only connection manager, with no public fallback.
++/// This is a normal FFI export so it is available on physical iOS devices.
++#[bridge_fn(jni = false, node = false)]
++fn ConnectionManager_new_local_demo(
++    user_agent: String,
++    chat_port: AsType<NonZeroU16, u16>,
++    root_certificate_der: &[u8],
++    remote_config: &mut BridgedStringMap,
++    build_variant: AsType<BuildVariant, u8>,
++) -> Result<ConnectionManager, IllegalArgumentError> {
++    if root_certificate_der.is_empty() || root_certificate_der.len() > 65_536 {
++        return Err(IllegalArgumentError::new(
++            "A private DER certificate is required",
++        ));
++    }
++    boring_signal::x509::X509::from_der(root_certificate_der)
++        .map_err(|_| IllegalArgumentError::new("The private DER certificate is invalid"))?;
++    let manager = ConnectionManager::new_from_isolated_environment(
++        local_demo::local_demo_env(chat_port.into_inner(), root_certificate_der),
++        &user_agent,
++        remote_config.take(),
++        build_variant.into_inner(),
++    );
++    manager.set_ipv6_enabled(false);
++    Ok(manager)
++}
++
+ #[bridge_fn]
+ fn ConnectionManager_set_proxy(
+     connection_manager: &ConnectionManager,
+diff --git a/rust/bridge/shared/types/src/net.rs b/rust/bridge/shared/types/src/net.rs
+index 5b6a852..c73e4d7 100644
+--- a/rust/bridge/shared/types/src/net.rs
++++ b/rust/bridge/shared/types/src/net.rs
+@@ -150,14 +150,37 @@ impl ConnectionManager {
+         user_agent: &str,
+         remote_config: HashMap<String, Arc<str>>,
+         build_variant: BuildVariant,
++    ) -> Self {
++        Self::new_with_environment(env, user_agent, remote_config, build_variant, false)
++    }
++
++    /// Build an isolated environment whose DNS resolution uses only its static map.
++    /// No system resolver or external DNS-over-HTTPS fallback is installed.
++    pub fn new_from_isolated_environment(
++        env: Env<'static>,
++        user_agent: &str,
++        remote_config: HashMap<String, Arc<str>>,
++        build_variant: BuildVariant,
++    ) -> Self {
++        Self::new_with_environment(env, user_agent, remote_config, build_variant, true)
++    }
++
++    fn new_with_environment(
++        env: Env<'static>,
++        user_agent: &str,
++        remote_config: HashMap<String, Arc<str>>,
++        build_variant: BuildVariant,
++        static_dns_only: bool,
+     ) -> Self {
+         let (network_change_event_tx, network_change_event_rx) = ::tokio::sync::watch::channel(());
+         let user_agent = UserAgent::with_libsignal_version(user_agent);
+-
+-        let dns_resolver = DnsResolver::new_with_static_fallback(
+-            env.static_fallback(StaticIpOrder::Shuffled(&mut rand::rngs::OsRng.unwrap_err())),
+-            &network_change_event_rx,
+-        );
++        let static_map =
++            env.static_fallback(StaticIpOrder::Shuffled(&mut rand::rngs::OsRng.unwrap_err()));
++        let dns_resolver = if static_dns_only {
++            DnsResolver::new_from_static_map(static_map)
++        } else {
++            DnsResolver::new_with_static_fallback(static_map, &network_change_event_rx)
++        };
+         let transport_connector =
+             std::sync::Mutex::new(TcpSslConnector::new_direct(dns_resolver.clone()));
+         let remote_config = RemoteConfig::new(remote_config, build_variant);
+diff --git a/rust/net/infra/src/dns.rs b/rust/net/infra/src/dns.rs
+index 4a8b6f3..9974d20 100644
+--- a/rust/net/infra/src/dns.rs
++++ b/rust/net/infra/src/dns.rs
+@@ -155,7 +155,6 @@ impl DnsResolver {
+ 
+     /// Creates a DNS resolver that will only use a provided static map
+     /// to resolve DNS lookups
+-    #[cfg(feature = "test-util")]
+     pub fn new_from_static_map(static_map: HashMap<&'static str, LookupResult>) -> Self {
+         DnsResolver {
+             lookup_options: Arc::new([LookupOption {
+diff --git a/swift/Sources/LibSignalClient/KeyTransparency.swift b/swift/Sources/LibSignalClient/KeyTransparency.swift
+index 15a3f96..2fb8bae 100644
+--- a/swift/Sources/LibSignalClient/KeyTransparency.swift
++++ b/swift/Sources/LibSignalClient/KeyTransparency.swift
+@@ -205,6 +205,9 @@ public enum KeyTransparency {
+             usernameHash: Data? = nil,
+             store: some Store
+         ) async throws {
++            guard self.environment != .localDemo else {
++                throw SignalError.invalidArgument("Key transparency is disabled for the private demo")
++            }
+             let e164 = e164Info?.e164
+             let uak = e164Info?.unidentifiedAccessKey
+ 
+diff --git a/swift/Sources/LibSignalClient/Net.swift b/swift/Sources/LibSignalClient/Net.swift
+index f3a4c42..1829170 100644
+--- a/swift/Sources/LibSignalClient/Net.swift
++++ b/swift/Sources/LibSignalClient/Net.swift
+@@ -20,6 +20,10 @@ public class Net {
+ 
+         /// Signal's production environment.
+         case production = 1
++
++        /// Isolated localhost demo. Only valid with the local-demo initializer.
++        /// Unsupported public-service APIs fail closed for this marker.
++        case localDemo = 2
+     }
+ 
+     /// Build variant for remote config key selection.
+@@ -64,6 +68,7 @@ public class Net {
+         buildVariant: BuildVariant,
+         remoteConfig: [String: String] = [:]
+     ) {
++        precondition(env != .localDemo, "Use the localhost demo initializer")
+         self.environment = env
+         self.asyncContext = TokioAsyncContext()
+         self.connectionManager = ConnectionManager(
+@@ -74,6 +79,30 @@ public class Net {
+         )
+     }
+ 
++    /// Connect exclusively to the app-owned localhost TLS relay and private CA.
++    /// This initializer never selects Signal production or staging endpoints.
++    /// CDS, SVR, and key transparency are unavailable in this environment.
++    public init(
++        localDemoChatPort: UInt16,
++        rootCertificateDer: Data,
++        userAgent: String,
++        buildVariant: BuildVariant,
++        remoteConfig: [String: String] = [:]
++    ) throws {
++        guard localDemoChatPort > 0, !rootCertificateDer.isEmpty, rootCertificateDer.count <= 65_536 else {
++            throw SignalError.invalidArgument("A localhost port and private DER certificate are required")
++        }
++        self.environment = .localDemo
++        self.asyncContext = TokioAsyncContext()
++        self.connectionManager = try ConnectionManager(
++            localDemoChatPort: localDemoChatPort,
++            rootCertificateDer: rootCertificateDer,
++            userAgent: userAgent,
++            remoteConfig: remoteConfig,
++            buildVariant: buildVariant
++        )
++    }
++
+     /// Sets the proxy host to be used for all new connections (until overridden).
+     ///
+     /// Sets a server to be used to proxy all new outgoing connections. The proxy can be
+@@ -95,6 +124,9 @@ public class Net {
+         username: String? = nil,
+         password: String? = nil
+     ) throws {
++        guard self.environment != .localDemo else {
++            throw SignalError.invalidArgument("The private demo uses only its app-owned localhost relay")
++        }
+         try self.connectionManager.setProxy(
+             scheme: scheme,
+             host: host,
+@@ -115,6 +147,9 @@ public class Net {
+     ///
+     /// - Throws: if the host or port is not structurally valid, such as a port of 0.
+     public func setProxy(host: String, port: UInt16?) throws {
++        guard self.environment != .localDemo else {
++            throw SignalError.invalidArgument("The private demo uses only its app-owned localhost relay")
++        }
+         // Support <username>@<host> syntax to allow UNENCRYPTED_FOR_TESTING as a marker user.
+         // This is not a stable feature of the API and may go away in the future;
+         // the Rust layer will reject any other users anyway. But it's convenient for us.
+@@ -161,7 +196,7 @@ public class Net {
+     ///
+     /// CC is off by default.
+     public func setCensorshipCircumventionEnabled(_ enabled: Bool) {
+-        self.connectionManager.setCensorshipCircumventionEnabled(enabled)
++        self.connectionManager.setCensorshipCircumventionEnabled(self.environment == .localDemo ? false : enabled)
+     }
+ 
+     /// Updates the remote configuration settings used by libsignal with the specified build variant.
+@@ -285,6 +320,9 @@ public class Net {
+         auth: Auth,
+         request: CdsiLookupRequest
+     ) async throws -> CdsiLookup {
++        guard self.environment != .localDemo else {
++            throw SignalError.invalidArgument("Contact discovery is disabled for the private demo")
++        }
+         let handle = try await self.asyncContext.invokeAsyncFunction { promise, asyncContext in
+             self.connectionManager.withNativeHandle { connectionManager in
+                 request.withNativeHandle { request in
+@@ -478,6 +516,30 @@ internal class ConnectionManager: NativeHandleOwner<SignalMutPointerConnectionMa
+         self.init(owned: NonNull(handle)!)
+     }
+ 
++    convenience init(
++        localDemoChatPort: UInt16,
++        rootCertificateDer: Data,
++        userAgent: String,
++        remoteConfig: [String: String],
++        buildVariant: Net.BuildVariant
++    ) throws {
++        let handle: SignalMutPointerConnectionManager = try remoteConfig.withBridgedStringMap { remoteConfig in
++            try rootCertificateDer.withUnsafeBorrowedBuffer { certificate in
++                try invokeFnReturningValueByPointer(.init()) {
++                    signal_connection_manager_new_local_demo(
++                        $0,
++                        userAgent,
++                        localDemoChatPort,
++                        certificate,
++                        remoteConfig,
++                        buildVariant.rawValue
++                    )
++                }
++            }
++        }
++        self.init(owned: NonNull(handle)!)
++    }
++
+     internal func setProxy(scheme: String, host: String, port: UInt16?, username: String?, password: String?) throws {
+         // We have to cast to Int32 because of how the port number is validated...for Java.
+         // But it also lets us distinguish "no port provided".
+diff --git a/swift/Sources/LibSignalClient/SecureValueRecoveryBackup.swift b/swift/Sources/LibSignalClient/SecureValueRecoveryBackup.swift
+index ce5e43a..bfc72db 100644
+--- a/swift/Sources/LibSignalClient/SecureValueRecoveryBackup.swift
++++ b/swift/Sources/LibSignalClient/SecureValueRecoveryBackup.swift
+@@ -84,7 +84,8 @@ public class SvrB {
+     /// Should not be used if any previous backups exist for this `backupKey`, whether uploaded or restored by the local device.
+     /// See ``SvrB`` for more information.
+     public func createNewBackupChain(backupKey: BackupKey) -> Data {
+-        backupKey.withUnsafePointer { backupKey in
++        precondition(net.environment != .localDemo, "SVR backups are disabled for the private demo")
++        return backupKey.withUnsafePointer { backupKey in
+             failOnError {
+                 try invokeFnReturningData {
+                     signal_secure_value_recovery_for_backups_create_new_backup_chain(
+@@ -129,6 +130,9 @@ public class SvrB {
+         backupKey: BackupKey,
+         previousSecretData: Data
+     ) async throws -> StoreBackupResponse {
++        guard net.environment != .localDemo else {
++            throw SignalError.invalidArgument("SVR backups are disabled for the private demo")
++        }
+         let rawResult = try await self.net.asyncContext.invokeAsyncFunction { promise, runtime in
+             net.connectionManager.withNativeHandle { connectionManager in
+                 backupKey.withUnsafePointer { backupKey in
+@@ -188,6 +192,9 @@ public class SvrB {
+         backupKey: BackupKey,
+         metadata: Data
+     ) async throws -> RestoreBackupResponse {
++        guard net.environment != .localDemo else {
++            throw SignalError.invalidArgument("SVR backups are disabled for the private demo")
++        }
+         let rawResult = try await self.net.asyncContext.invokeAsyncFunction {
+             promise,
+             runtime in
+@@ -231,6 +238,9 @@ public class SvrB {
+     ///   - Other ``SignalError``s for networking and attestation issues. These can be manually
+     ///     retried, but some may indicate a possible bug in libsignal or in the enclave.
+     public func remove() async throws {
++        guard net.environment != .localDemo else {
++            throw SignalError.invalidArgument("SVR backups are disabled for the private demo")
++        }
+         let _: Bool = try await self.net.asyncContext.invokeAsyncFunction {
+             promise,
+             runtime in
+diff --git a/swift/Sources/SignalFfi/signal_ffi.h b/swift/Sources/SignalFfi/signal_ffi.h
+index ffcf43b..2d59876 100644
+--- a/swift/Sources/SignalFfi/signal_ffi.h
++++ b/swift/Sources/SignalFfi/signal_ffi.h
+@@ -4494,6 +4494,14 @@ SignalFfiError* signal_connection_manager_new(
+   SignalMutPointerBridgedStringMap remote_config,
+   uint8_t build_variant
+ );
++SignalFfiError* signal_connection_manager_new_local_demo(
++  SignalMutPointerConnectionManager* out,
++  const int8_t* user_agent,
++  uint16_t chat_port,
++  SignalBorrowedBuffer root_certificate_der,
++  SignalMutPointerBridgedStringMap remote_config,
++  uint8_t build_variant
++);
+ SignalFfiError* signal_connection_manager_on_network_change(
+   SignalConstPointerConnectionManager connection_manager
+ );
+@@ -7041,4 +7049,4 @@ typedef SignalType_FunctionPointer_void_MutPointer_void SignalFfiSenderKeyStoreD
+ typedef SignalType_FunctionPointer_void_MutPointer_void SignalFfiSessionStoreDestroy;
+ typedef SignalType_FunctionPointer_void_MutPointer_void SignalFfiSignedPreKeyStoreDestroy;
+ typedef SignalType_FunctionPointer_void_MutPointer_void SignalFfiSyncInputStreamDestroy;
+-typedef uint64_t SignalCancellationId;
+\ No newline at end of file
++typedef uint64_t SignalCancellationId;
+diff --git a/swift/Tests/LibSignalClientTests/NetTests.swift b/swift/Tests/LibSignalClientTests/NetTests.swift
+index 3f94f2a..e5478e2 100644
+--- a/swift/Tests/LibSignalClientTests/NetTests.swift
++++ b/swift/Tests/LibSignalClientTests/NetTests.swift
+@@ -14,6 +14,34 @@ import Testing
+ let userAgent: String = "test"
+ 
+ final class NetTests {
++    @Test
++    func localDemoRequiresAnExplicitPortAndValidPrivateCertificate() throws {
++        #expect(throws: SignalError.self) {
++            try Net(
++                localDemoChatPort: 0,
++                rootCertificateDer: Data([1]),
++                userAgent: "sig-demo-test",
++                buildVariant: .beta
++            )
++        }
++        #expect(throws: SignalError.self) {
++            try Net(
++                localDemoChatPort: 14443,
++                rootCertificateDer: Data(),
++                userAgent: "sig-demo-test",
++                buildVariant: .beta
++            )
++        }
++        #expect(throws: SignalError.self) {
++            try Net(
++                localDemoChatPort: 14443,
++                rootCertificateDer: Data([1, 2, 3]),
++                userAgent: "sig-demo-test",
++                buildVariant: .beta
++            )
++        }
++    }
++
+     @Test
+     func cdsiLookupResultConversion() async throws {
+         let ACI_UUID = "9d0652a3-dcc3-4d11-975f-74d61598733f"
+diff --git a/rust/bridge/shared/src/net/local_demo.rs b/rust/bridge/shared/src/net/local_demo.rs
+new file mode 100644
+--- /dev/null
++++ b/rust/bridge/shared/src/net/local_demo.rs
+@@ -0,0 +1,190 @@
++//! Localhost-only demo environment, adapted from the pinned upstream test environment.
++//
++// Copyright 2024 Signal Messenger, LLC.
++// SPDX-License-Identifier: AGPL-3.0-only
++//
++use std::net::Ipv4Addr;
++use std::num::NonZeroU16;
++
++use attest::svr2::RaftConfig;
++use libsignal_net::chat::RECOMMENDED_CHAT_WS_CONFIG;
++use libsignal_net::connect_state::ServiceName;
++use libsignal_net::enclave::{Cdsi, EnclaveEndpoint, EndpointParams, MrEnclave, SvrSgx};
++use libsignal_net::env::{ConnectionConfig, DomainConfig, Env, KeyTransConfig, Svr2Env, SvrBEnv};
++use libsignal_net::infra::RECOMMENDED_WS_CONFIG;
++use libsignal_net::infra::certs::RootCertificates;
++use libsignal_net::infra::route::HttpVersion;
++
++const ENCLAVE_ID_MOCK_SERVER: &[u8] = b"0.20240911.184407";
++
++fn localhost_demo_domain_config(
++    service: ServiceName,
++    port: NonZeroU16,
++    root_certificate_der: &[u8],
++    http_version: HttpVersion,
++) -> DomainConfig {
++    const LOCALHOST_IP_V4: Ipv4Addr = Ipv4Addr::LOCALHOST;
++    DomainConfig {
++        ip_v4: &[LOCALHOST_IP_V4],
++        ip_v6: &[],
++        connect: ConnectionConfig {
++            service,
++            hostname: "localhost",
++            port,
++            cert: RootCertificates::FromDer(std::borrow::Cow::Owned(root_certificate_der.to_vec())),
++            http_version: Some(http_version),
++            min_tls_version: None,
++            confirmation_header_name: None,
++            proxy: None,
++        },
++    }
++}
++
++pub(crate) struct LocalhostEnvPortConfig {
++    pub(crate) chat_port: NonZeroU16,
++    pub(crate) cdsi_port: NonZeroU16,
++    pub(crate) svr2_port: NonZeroU16,
++    pub(crate) svrb_port: NonZeroU16,
++}
++
++const DUMMY_RAFT_CONFIG: &RaftConfig = &RaftConfig {
++    min_voting_replicas: 3,
++    max_voting_replicas: 9,
++    super_majority: 0,
++    group_id: 17325409821474389983,
++    attestation_timeout: 604800,
++    db_version: 2,
++    simulated: false,
++};
++
++const DUMMY_CDSI_ENDPOINT_PARAMS: EndpointParams<'static, Cdsi> = EndpointParams {
++    mr_enclave: MrEnclave::new(ENCLAVE_ID_MOCK_SERVER),
++    raft_config: (),
++};
++
++const DUMMY_SVR2_ENDPOINT_PARAMS: EndpointParams<'static, SvrSgx> = EndpointParams {
++    mr_enclave: MrEnclave::new(ENCLAVE_ID_MOCK_SERVER),
++    raft_config: DUMMY_RAFT_CONFIG,
++};
++
++const DUMMY_SVRB_ENDPOINT_PARAMS: EndpointParams<'static, SvrSgx> = EndpointParams {
++    mr_enclave: MrEnclave::new(ENCLAVE_ID_MOCK_SERVER),
++    raft_config: DUMMY_RAFT_CONFIG,
++};
++
++const DUMMY_KEYTRANS_CONFIG: KeyTransConfig = KeyTransConfig {
++    signing_key_material: &[0; 32],
++    vrf_key_material: &[0; 32],
++    auditor_key_material: &[&[0; 32]],
++};
++
++pub(crate) fn localhost_demo_env_with_ports(
++    ports: LocalhostEnvPortConfig,
++    root_certificate_der: &[u8],
++    http_version: HttpVersion,
++) -> Env<'static> {
++    Env {
++        chat_domain_config: localhost_demo_domain_config(
++            ServiceName("chat"),
++            ports.chat_port,
++            root_certificate_der,
++            http_version,
++        ),
++        chat_ws_config: RECOMMENDED_CHAT_WS_CONFIG,
++        cdsi: EnclaveEndpoint {
++            domain_config: localhost_demo_domain_config(
++                ServiceName("cdsi"),
++                ports.cdsi_port,
++                root_certificate_der,
++                http_version,
++            ),
++            ws_config: RECOMMENDED_WS_CONFIG,
++            params: DUMMY_CDSI_ENDPOINT_PARAMS,
++        },
++        svr2: Svr2Env {
++            current: EnclaveEndpoint {
++                domain_config: localhost_demo_domain_config(
++                    ServiceName("svr2"),
++                    ports.svr2_port,
++                    root_certificate_der,
++                    http_version,
++                ),
++                ws_config: RECOMMENDED_WS_CONFIG,
++                params: DUMMY_SVR2_ENDPOINT_PARAMS,
++            },
++            previous: None,
++        },
++        svr_b: SvrBEnv::new(
++            [
++                Some(EnclaveEndpoint {
++                    domain_config: localhost_demo_domain_config(
++                        ServiceName("svrb"),
++                        ports.svrb_port,
++                        root_certificate_der,
++                        http_version,
++                    ),
++                    ws_config: RECOMMENDED_WS_CONFIG,
++                    params: DUMMY_SVRB_ENDPOINT_PARAMS,
++                }),
++                None,
++                None,
++            ],
++            [None, None, None],
++        ),
++        keytrans_config: DUMMY_KEYTRANS_CONFIG,
++        reflector_providers: || &[],
++    }
++}
++
++/// Build no public-service route: unsupported services are confined to the closed
++/// loopback port 1 and are rejected by the Swift API before any connection.
++pub(crate) fn local_demo_env(chat_port: NonZeroU16, root_certificate_der: &[u8]) -> Env<'static> {
++    let disabled_port = NonZeroU16::new(1).expect("one is nonzero");
++    localhost_demo_env_with_ports(
++        LocalhostEnvPortConfig {
++            chat_port,
++            cdsi_port: disabled_port,
++            svr2_port: disabled_port,
++            svrb_port: disabled_port,
++        },
++        root_certificate_der,
++        HttpVersion::Http2,
++    )
++}
++
++#[cfg(test)]
++mod tests {
++    use super::*;
++
++    #[test]
++    fn every_route_remains_on_loopback_with_only_the_supplied_root() {
++        let certificate = &[1, 2, 3];
++        let env = local_demo_env(NonZeroU16::new(14443).expect("nonzero"), certificate);
++        let mut domains = vec![
++            &env.chat_domain_config,
++            &env.cdsi.domain_config,
++            &env.svr2.current.domain_config,
++        ];
++        domains.extend(
++            env.svr_b
++                .current_and_previous()
++                .map(|endpoint| &endpoint.domain_config),
++        );
++        for domain in domains {
++            assert_eq!(domain.connect.hostname, "localhost");
++            assert_eq!(domain.ip_v4, &[Ipv4Addr::LOCALHOST]);
++            assert!(domain.ip_v6.is_empty());
++            assert!(domain.connect.proxy.is_none());
++            assert_eq!(domain.connect.http_version, Some(HttpVersion::Http2));
++            assert_eq!(
++                domain.connect.cert,
++                RootCertificates::FromDer(certificate.to_vec().into())
++            );
++        }
++        assert_eq!(env.chat_domain_config.connect.port.get(), 14443);
++        assert_eq!(env.cdsi.domain_config.connect.port.get(), 1);
++        assert_eq!(env.svr2.current.domain_config.connect.port.get(), 1);
++        assert!(env.svr2.previous.is_none());
++        assert!((env.reflector_providers)().is_empty());
++    }
++}

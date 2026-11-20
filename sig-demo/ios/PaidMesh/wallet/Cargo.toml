@@ -1,0 +1,34 @@
+[package]
+name = "sig-demo-paid-mesh-wallet"
+version = "0.1.0"
+edition = "2024"
+publish = false
+license = "AGPL-3.0-only"
+
+[features]
+test-support = []
+
+[dependencies]
+anyhow = "1"
+async-trait = "0.1"
+bitcoin = "0.32"
+fs2 = "0.4"
+getrandom = "0.3"
+lexe = { version = "=0.1.24", features = ["unstable"] }
+lexe-api-core = "=0.1.24"
+mesh-llm-wallet = { path = "../../../../.sig-demo/ios/paid-mesh-probe/source/mesh/crates/mesh-llm-wallet" }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["sync", "time", "rt", "macros"] }
+zeroize = "1"
+
+[target.'cfg(target_os = "ios")'.dependencies]
+core-foundation = "0.10"
+security-framework = "=3.7.0"
+security-framework-sys = "=2.17.0"
+
+[dev-dependencies]
+tempfile = "3"
+
+[workspace]

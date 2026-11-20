@@ -1,0 +1,13 @@
+--- a/Pods/SignalRingRTC/src/ios/SignalRingRTC/SignalRingRTC/GroupCall.swift
++++ b/Pods/SignalRingRTC/src/ios/SignalRingRTC/SignalRingRTC/GroupCall.swift
+@@ -5,6 +5,10 @@
+ 
+ import SignalRingRTC.RingRTC
+ import WebRTC
++
++// The C ABI defines DemuxId as uint32_t. Keep the alias available from the
++// public Swift module as well as its explicit RingRTC C submodule.
++public typealias DemuxId = UInt32
+ 
+ /// Represents the connection state to a media server for a group call.
+ @available(iOSApplicationExtension, unavailable)

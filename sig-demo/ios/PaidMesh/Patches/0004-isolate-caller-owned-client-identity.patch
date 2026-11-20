@@ -1,0 +1,223 @@
+--- a/mesh/crates/mesh-llm-host-runtime/src/mesh/node.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/mesh/node.rs
+@@ -72,6 +72,9 @@
+ pub struct Node {
+     pub(crate) endpoint: Endpoint,
+     pub(crate) endpoint_secret_key: SecretKey,
++    /// Caller-supplied client keys must not borrow the host's default identity
++    /// metadata, peer-block state, or adopted membership cache.
++    pub(crate) owned_client_identity: bool,
+     pub(crate) public_addr: Option<stun::PublicAddr>,
+     pub(crate) quic_bind: QuicBindSelection,
+     pub(crate) relay_policy: RelayPolicy,
+@@ -732,6 +735,7 @@
+         local_mesh_requirements: crate::MeshRequirements,
+         client_secret_key: Option<SecretKey>,
+     ) -> Result<(Self, TunnelChannels)> {
++        let owned_client_identity = matches!(role, NodeRole::Client) && client_secret_key.is_some();
+         let secret_key = match client_secret_key {
+             Some(key) => {
+                 anyhow::ensure!(
+@@ -822,6 +826,7 @@
+         let node = Node {
+             endpoint,
+             endpoint_secret_key: secret_key.clone(),
++            owned_client_identity,
+             public_addr,
+             quic_bind,
+             relay_policy: relay.policy,
+@@ -904,7 +909,11 @@
+             gpu_compute_tflops_fp32: Arc::new(tokio::sync::Mutex::new(None)),
+             gpu_compute_tflops_fp16: Arc::new(tokio::sync::Mutex::new(None)),
+             config_state: Arc::new(tokio::sync::Mutex::new(config_state_init)),
+-            peer_blocks: crate::network::peer_blocks::PeerBlocks::for_this_node(),
++            peer_blocks: if owned_client_identity {
++                crate::network::peer_blocks::PeerBlocks::in_memory()
++            } else {
++                crate::network::peer_blocks::PeerBlocks::for_this_node()
++            },
+             config_revision_tx: {
+                 let (tx, _rx) = tokio::sync::watch::channel(config_revision_init);
+                 Arc::new(tx)
+@@ -1006,6 +1015,7 @@
+         Node {
+             endpoint,
+             endpoint_secret_key: secret_key,
++            owned_client_identity: false,
+             public_addr: None,
+             quic_bind: QuicBindSelection::default(),
+             relay_policy: RelayPolicy::Disabled,
+--- a/mesh/crates/mesh-llm-host-runtime/src/mesh/node_requirements.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/mesh/node_requirements.rs
+@@ -74,6 +74,9 @@
+ 
+ impl Node {
+     fn membership_file(&self) -> Result<Option<std::path::PathBuf>> {
++        if self.owned_client_identity {
++            return Ok(None);
++        }
+         #[cfg(test)]
+         {
+             Ok(self.adopted_membership_file.clone())
+--- a/mesh/crates/mesh-llm-host-runtime/src/runtime/auto_join.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/runtime/auto_join.rs
+@@ -528,8 +528,10 @@
+         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+         if let Some(id) = save_node.mesh_id().await {
+             record_first_joined_mesh_ts(&save_node).await;
+-            if let Err(error) = mesh::save_last_mesh_id(&id) {
+-                tracing::warn!(error = %error, "failed to save last mesh ID");
++            if !save_node.owned_client_identity {
++                if let Err(error) = mesh::save_last_mesh_id(&id) {
++                    tracing::warn!(error = %error, "failed to save last mesh ID");
++                }
+             }
+             tracing::info!("Mesh ID: {id}");
+         }
+--- a/mesh/crates/mesh-llm-host-runtime/src/runtime/run_auto.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/runtime/run_auto.rs
+@@ -1219,14 +1219,30 @@
+     } else {
+         None
+     };
+-    let mesh_id = node
+-        .initialize_mesh_identity_as_originator(
++    let memory_name = super::startup_identity::client_memory_mesh_name(
++        options.client,
++        options.client_secret_key.is_some(),
++        node.local_mesh_requirements.is_unrestricted(),
++        &node.id().to_string(),
++    );
++    let mesh_id = if let Some(name) = memory_name {
++        // Named mesh ID derivation is deterministic and performs no filesystem
++        // access. It is a temporary standalone client identity until discovery
++        // joins a real mesh; restricted requirements retain the signed path.
++        let id = mesh::generate_mesh_id(Some(&name), None)?;
++        node.set_mesh_id_force(id.clone()).await;
++        id
++    } else {
++        node.initialize_mesh_identity_as_originator(
+             options.mesh_name.as_deref(),
+             nostr_pubkey.as_deref(),
+         )
+-        .await?;
++        .await?
++    };
+     record_first_joined_mesh_ts(node).await;
+-    mesh::save_last_mesh_id(&mesh_id)?;
++    if !node.owned_client_identity {
++        mesh::save_last_mesh_id(&mesh_id)?;
++    }
+     tracing::info!("Mesh ID: {mesh_id}");
+     let _ = emit_event(OutputEvent::InviteToken {
+         token: node.invite_token().await,
+--- a/mesh/crates/mesh-llm-host-runtime/src/runtime/startup_identity.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/runtime/startup_identity.rs
+@@ -22,7 +22,26 @@
+     });
+ }
+ 
++/// An injected client key belongs to the embedding caller, not the default
++/// host identity files. Workers and ordinary CLI clients retain legacy state.
++pub(super) fn owns_client_identity(client: bool, injected_key: bool) -> bool {
++    client && injected_key
++}
++
++pub(super) fn client_memory_mesh_name(
++    client: bool,
++    injected_key: bool,
++    unrestricted: bool,
++    public_endpoint_id: &str,
++) -> Option<String> {
++    (owns_client_identity(client, injected_key) && unrestricted)
++        .then(|| format!("embedded-client:{public_endpoint_id}"))
++}
++
+ pub(super) fn handle_public_identity_transition(options: &RuntimeOptions) -> Result<()> {
++    if owns_client_identity(options.client, options.client_secret_key.is_some()) {
++        return Ok(());
++    }
+     let is_public = options.mesh_discovery_mode == mesh_discovery::MeshDiscoveryMode::Nostr
+         && (options.auto || options.publish || options.discover.is_some());
+     if is_public {
+@@ -39,3 +58,41 @@
+     }
+     Ok(())
+ }
++
++#[cfg(test)]
++mod embedded_client_identity_tests {
++    use super::*;
++
++    #[test]
++    fn only_injected_clients_own_their_identity() {
++        for (client, injected, expected) in [
++            (false, false, false),
++            (false, true, false),
++            (true, false, false),
++            (true, true, true),
++        ] {
++            assert_eq!(owns_client_identity(client, injected), expected);
++        }
++    }
++
++    #[test]
++    fn memory_mesh_names_preserve_restricted_and_legacy_paths() {
++        for client in [false, true] {
++            for injected in [false, true] {
++                for unrestricted in [false, true] {
++                    let name =
++                        client_memory_mesh_name(client, injected, unrestricted, "public-endpoint");
++                    assert_eq!(name.is_some(), client && injected && unrestricted);
++                }
++            }
++        }
++        assert_eq!(
++            client_memory_mesh_name(true, true, true, "public-endpoint"),
++            Some("embedded-client:public-endpoint".to_owned())
++        );
++        assert_ne!(
++            client_memory_mesh_name(true, true, true, "first"),
++            client_memory_mesh_name(true, true, true, "second")
++        );
++    }
++}
+--- a/mesh/crates/mesh-llm-host-runtime/src/runtime/startup_models.rs
++++ b/mesh/crates/mesh-llm-host-runtime/src/runtime/startup_models.rs
+@@ -98,6 +98,12 @@
+         return Ok(Some(path));
+     }
+ 
++    if super::startup_identity::owns_client_identity(
++        options.client,
++        options.client_secret_key.is_some(),
++    ) {
++        return Ok(None);
++    }
+     let default_path = default_keystore_path()?;
+     if keystore_exists(&default_path) {
+         Ok(Some(default_path))
+@@ -154,10 +160,19 @@
+     options: &RuntimeOptions,
+     config: &plugin::MeshConfig,
+ ) -> Result<mesh::OwnerRuntimeConfig> {
+-    let trust_store_path = default_trust_store_path()?;
+-    let trust_store = load_trust_store(&trust_store_path)
+-        .with_context(|| format!("Failed to load trust store {}", trust_store_path.display()))?
+-        .merged_with_trusted_owners(&options.trust_owner);
++    let trust_store = if super::startup_identity::owns_client_identity(
++        options.client,
++        options.client_secret_key.is_some(),
++    ) {
++        // The embedding caller supplies any desired owner policy explicitly.
++        // Do not inherit another host/default identity's trust configuration.
++        crate::crypto::TrustStore::default()
++    } else {
++        let trust_store_path = default_trust_store_path()?;
++        load_trust_store(&trust_store_path)
++            .with_context(|| format!("Failed to load trust store {}", trust_store_path.display()))?
++    }
++    .merged_with_trusted_owners(&options.trust_owner);
+     let trust_policy = options.trust_policy.unwrap_or(trust_store.policy);
+ 
+     let keypair = match resolve_runtime_owner_key_path(options)? {

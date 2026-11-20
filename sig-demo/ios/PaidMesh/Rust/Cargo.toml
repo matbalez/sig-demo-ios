@@ -1,0 +1,52 @@
+[package]
+name = "sig-demo-paid-mesh"
+version = "0.1.0"
+edition = "2024"
+description = "Isolated client-only Mesh payments-v3 runtime for the Sig iOS demo"
+publish = false
+
+[workspace]
+
+[features]
+test-support = ["sig-demo-paid-mesh-wallet/test-support", "dep:mesh-llm-membership"]
+
+[[example]]
+name = "public-catalog"
+required-features = ["test-support"]
+
+[lib]
+name = "sig_demo_paid_mesh"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+anyhow = "1"
+iroh = { version = "1.4.1", default-features = false }
+async-trait = "0.1"
+mesh-llm-host-runtime = { path = "../../../../.sig-demo/ios/paid-mesh-probe/source/mesh/crates/mesh-llm-host-runtime", default-features = false, features = ["payments", "dynamic-native-runtime"] }
+mesh-llm-payments = { path = "../../../../.sig-demo/ios/paid-mesh-probe/source/mesh/crates/mesh-llm-payments", features = ["plugin-server"] }
+mesh-llm-payments-types = { path = "../../../../.sig-demo/ios/paid-mesh-probe/source/mesh/crates/mesh-llm-payments-types", features = ["engine"] }
+mesh-llm-plugin = { path = "../../../../.sig-demo/ios/paid-mesh-probe/source/mesh/crates/mesh-llm-plugin" }
+mesh-llm-wallet = { path = "../../../../.sig-demo/ios/paid-mesh-probe/source/mesh/crates/mesh-llm-wallet" }
+mesh-llm-membership = { path = "../../../../.sig-demo/ios/paid-mesh-probe/source/mesh/crates/mesh-llm-membership", optional = true, features = ["test-support"] }
+rmcp = { version = "3", features = ["server"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sig-demo-paid-mesh-wallet = { path = "../wallet" }
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "macros", "net"] }
+reqwest = { version = "0.13", features = ["json", "stream"] }
+zeroize = "1"
+
+[dev-dependencies]
+tempfile = "3"
+sig-demo-paid-mesh-wallet = { path = "../wallet", features = ["test-support"] }
+
+[profile.dev]
+debug = 0
+incremental = false
+
+[profile.release]
+opt-level = 1
+debug = 0
+strip = "debuginfo"
+incremental = false
+codegen-units = 32

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/Mesh-LLM/mesh-llm",
+  "revision": "c7d5157384e072ad82c58916f4d3bcca50894f25",
+  "sourceArchive": {
+    "url": "https://codeload.github.com/Mesh-LLM/mesh-llm/tar.gz/c7d5157384e072ad82c58916f4d3bcca50894f25",
+    "sha256": "2a71914b65693b047183f5ff116c25e5757668f5e75e3c25991de3f73ec7aa85"
+  },
+  "paymentsV3": {
+    "pullRequest": "https://github.com/Mesh-LLM/mesh-llm/pull/2407",
+    "mergeCommit": "51956c238cb3e0decfb054714a4f59cd4b45ebf4"
+  },
+  "rustToolchain": "1.95.0",
+  "minimumIOSVersion": "16.0",
+  "minimumMacOSVersion": "13.0",
+  "features": [
+    "payments",
+    "dynamic-native-runtime"
+  ],
+  "nodeMode": "client",
+  "modelServing": false,
+  "inferencePaymentReceiving": false,
+  "externalWalletProcess": false,
+  "publishedFreeSDKUnchanged": true,
+  "sourcePatches": [
+    {
+      "path": "Patches/0001-stable-paid-client-identity.patch",
+      "sha256": "d37708ea53635b0451f8b3e3a547814019a2757f1d1efe04dc258ec92749dbf6",
+      "purpose": "Inject an in-memory per-account authenticated client identity so payments-v3 recovery retains the original buyer endpoint. No config serialization or global environment override."
+    },
+    {
+      "path": "Patches/0002-in-process-payments-only.patch",
+      "sha256": "93ca72be922a52af81429a9b2dcafbbd0d22db7ab52bed3e10c547c29af4b1bc",
+      "purpose": "Explicit embedded mode resolves only the injected in-process payments engine, before inspecting any global installed-plugin metadata or launching external plugins."
+    },
+    {
+      "path": "Patches/0003-release-inference-bridge-on-shutdown.patch",
+      "sha256": "301067eac52c6c4e2834c57e666a04b2d3012565ebcd6014f85a0488b605a9f3",
+      "purpose": "Terminal plugin-manager shutdown detaches its self-owning inference bridge and rejects late reinstallation, releasing stopped Nodes and per-account payment wallet leases."
+    },
+    {
+      "path": "Patches/0004-isolate-caller-owned-client-identity.patch",
+      "sha256": "de2b1c48cf42931eaeab927527e2ee62c8e2e35f092ea80cbb678465b3df45a1",
+      "purpose": "Caller-injected client identities avoid unrelated global desktop identity transitions and adopted/default trust caches; unrestricted no-candidate clients use an endpoint-derived in-memory mesh ID. Legacy clients, workers, explicit owner/trust policy and restricted bootstrap validation remain unchanged."
+    }
+  ],
+  "frameworkPackaging": {
+    "kind": "dynamic framework linked from owned Rust static archive",
+    "installName": "@rpath/SigDemoPaidMeshFFI.framework/SigDemoPaidMeshFFI",
+    "exportedSymbols": "Rust/native.exports",
+    "namespace": "two-level; bundled SQLite private",
+    "postSigningMutation": false
+  },
+  "buildTargets": [
+    "aarch64-apple-darwin",
+    "aarch64-apple-ios-sim",
+    "aarch64-apple-ios"
+  ]
+}

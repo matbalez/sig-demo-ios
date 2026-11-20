@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "active_engine": {
+    "crate": "goose-local-inference",
+    "version": "0.1.0-alpha.12",
+    "repository": "https://github.com/aaif-goose/goose",
+    "commit": "4811ae25f736fdf0ede847449c060e96645426b5",
+    "upstream_crate_sha256": "a17b360274477d6ed121f8c417cac05811080c9457b0662525a13e3e225f9f41",
+    "backend": "llama.cpp Metal",
+    "gpu_required": true,
+    "source_preparation": "sig-demo/gdk/native-agent/llama/prepare.py"
+  },
+  "llama": {
+    "repository": "https://github.com/ggml-org/llama.cpp",
+    "tag": "b12110",
+    "commit": "cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "archive_url": "https://codeload.github.com/ggml-org/llama.cpp/tar.gz/cd959bae99ff4bed22bef2604f45241c09bbb8c8",
+    "license": "MIT",
+    "archive_sha256": "fbe74146a3cdc00f706773eb233bc4aedb7d8c3c7e2122440e492a99c1ec5a76"
+  },
+  "models": [
+    {
+      "id": "lfm3-1.7b-q4-k-m",
+      "title": "Liquid LFM3 1.7B",
+      "repository": "LiquidAI/LFM3-1.7B-GGUF",
+      "revision": "cd0c74c575b5c416f3011b5b4c298077f26ca8c2",
+      "filename": "LFM3-1.7B-Q4_K_M.gguf",
+      "bytes": 1099627808,
+      "sha256": "3793e1e6e2266919d6e015287221b41100175a98eddaba92e111aed3b05c93c4",
+      "architecture": "lfm3",
+      "license": "LFM Open License v1.0",
+      "original_model": "LiquidAI/LFM3-1.7B"
+    }
+  ]
+}
