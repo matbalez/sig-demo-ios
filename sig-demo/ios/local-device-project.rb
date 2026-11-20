@@ -3,6 +3,7 @@
 require 'digest'
 require 'fileutils'
 require 'json'
+require 'open3'
 require 'pathname'
 require 'xcodeproj'
 
@@ -18,22 +19,34 @@ module SigDemoLocalDeviceProject
       raise 'Missing sibling NativeAgent package.' unless native_agent.join('Package.swift').file?
       reference.relative_path = native_agent.to_s
     end
+    deployment = '17.0'
+    ios = Pathname.new(__dir__).realpath
+    canonical_mesh = ios.join('Mesh')
     if mesh_package
       raise 'Use the qualified owned private Mesh package.' unless mesh_package.to_s.start_with?('/private/tmp/sig-demo-device-mesh-') && mesh_package.basename.to_s == 'Mesh' && mesh_package.stat.uid == Process.uid && !mesh_package.symlink?
-      canonical_mesh = Pathname.new(__dir__).join('Mesh').realpath
-      project.root_object.package_references.each do |reference|
-        next unless reference.isa == 'XCLocalSwiftPackageReference'
-        path = Pathname.new(reference.relative_path).cleanpath
-        if path == canonical_mesh
-          reference.relative_path = mesh_package.to_s
-        elsif path.to_s.start_with?(output.join('Packages/PaidMesh-').to_s)
-          manifest = path.join('Package.swift')
-          raise 'Invalid owned staged PaidMesh manifest.' if manifest.symlink? || manifest.stat.uid != Process.uid
-          contents = manifest.read
-          old = '.package(path: ' + JSON.generate(canonical_mesh.to_s) + ')'
-          raise 'Unexpected staged PaidMesh dependency.' unless contents.scan(old).length == 1
-          manifest.write(contents.sub(old, '.package(path: ' + JSON.generate(mesh_package.to_s) + ')'))
-        end
+      sdk_parent = mesh_package.parent
+    else
+      mesh_package = canonical_mesh
+      sdk_parent = ios.parent.parent.join('.sig-demo/ios')
+    end
+    mesh_pin = JSON.parse(canonical_mesh.join('source.lock.json').read)
+    sdk = sdk_parent.join('mesh-sdk-v' + mesh_pin.fetch('version'))
+    staged, error, status = Open3.capture3('python3', canonical_mesh.join('stage-device.py').to_s,
+      '--mesh', mesh_package.to_s, '--sdk', sdk.to_s, '--parent', output.join('Packages').to_s, '--deployment', deployment)
+    raise "Cannot stage the device Mesh package: #{error}" unless status.success?
+    mesh_package = Pathname.new(staged.strip)
+    project.root_object.package_references.each do |reference|
+      next unless reference.isa == 'XCLocalSwiftPackageReference'
+      path = Pathname.new(reference.relative_path).cleanpath
+      if path == canonical_mesh
+        reference.relative_path = mesh_package.to_s
+      elsif path.to_s.start_with?(output.join('Packages/PaidMesh-').to_s)
+        manifest = path.join('Package.swift')
+        raise 'Invalid owned staged PaidMesh manifest.' if manifest.symlink? || manifest.stat.uid != Process.uid
+        contents = manifest.read
+        old = '.package(path: ' + JSON.generate(canonical_mesh.to_s) + ')'
+        raise 'Unexpected staged PaidMesh dependency.' unless contents.scan(old).length == 1
+        manifest.write(contents.sub(old, '.package(path: ' + JSON.generate(mesh_package.to_s) + ')'))
       end
     end
     %w[Signal SignalNSE SignalShareExtension].each do |name|
@@ -41,8 +54,8 @@ module SigDemoLocalDeviceProject
       release = target&.build_configurations&.find { |item| item.name == 'App Store Release' }
       debug = target&.build_configurations&.find { |item| item.name == 'Debug' }
       raise "Missing prepared Debug/release target: #{name}" unless release && debug
-      debug.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '17.0'
-      release.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '17.0' if testflight
+      debug.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = deployment
+      release.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = deployment if testflight
       # Use the exact private device namespace/metadata already prepared by the
       # release helper; never substitute simulator identities or signing groups.
       %w[INFOPLIST_FILE CODE_SIGN_ENTITLEMENTS CURRENT_PROJECT_VERSION MARKETING_VERSION].each do |key|

@@ -14,7 +14,14 @@ def run(*args):
     return subprocess.run(args, check=True, capture_output=True, text=True).stdout
 
 
-def inspect_binary(binary, maximum_minimum):
+def os_version(value):
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9]+(?:\.[0-9]+){0,2}", value):
+        raise ValueError(f"Invalid iPhone minimum OS version: {value!r}")
+    fields = [int(n) for n in value.split(".")]
+    return tuple((fields + [0, 0])[:3])
+
+
+def inspect_binary(binary, maximum_minimum, bundle_minimum):
     architectures = run("xcrun", "lipo", "-archs", str(binary)).split()
     if architectures != ["arm64"]:
         raise ValueError(f"Unexpected device architectures: {binary.name}")
@@ -30,9 +37,12 @@ def inspect_binary(binary, maximum_minimum):
         minimum_match = re.search(r"LC_VERSION_MIN_IPHONEOS\n(?:[^\n]*\n){0,2}?\s*version ([0-9.]+)", metadata)
     if not minimum_match:
         raise ValueError(f"Missing device deployment declaration: {binary.name}")
-    minimum = tuple(int(v) for v in (minimum_match[1].split(".") + ["0", "0"])[:3])
-    if minimum > (maximum_minimum, 0, 0):
-        raise ValueError(f"Payload requires newer than iOS {maximum_minimum}: {binary.name}")
+    native = os_version(minimum_match[1])
+    declared = os_version(bundle_minimum)
+    if native > declared:
+        raise ValueError(f"{binary.name}: Mach-O minimum iOS {minimum_match[1]} exceeds bundle MinimumOSVersion {bundle_minimum}")
+    if declared > (maximum_minimum, 0, 0):
+        raise ValueError(f"{binary.name}: bundle minimum iOS {bundle_minimum} exceeds the app minimum {maximum_minimum}")
 
 
 def main():
@@ -96,10 +106,10 @@ def main():
             access = entitlements.get("keychain-access-groups", [])
             if len(access) != 1 or not access[0].endswith(".dev.matbalez.sig-demo.ios.signal"):
                 raise ValueError(f"Unexpected private Keychain entitlement: {bundle.name}")
-    bundles = list(expected) + sorted((app / "Frameworks").glob("*.framework"))
+    bundles = list(expected) + sorted(app.rglob("*.framework"))
     for bundle in bundles:
         info = plistlib.loads((bundle / "Info.plist").read_bytes())
-        inspect_binary(bundle / info["CFBundleExecutable"], minimum_ios)
+        inspect_binary(bundle / info["CFBundleExecutable"], minimum_ios, info.get("MinimumOSVersion"))
         if args.require_signed:
             run("codesign", "--verify", "--strict", str(bundle))
     app_info = plistlib.loads((app / "Info.plist").read_bytes())

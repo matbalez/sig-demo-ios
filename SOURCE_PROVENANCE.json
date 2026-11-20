@@ -1,5 +1,5 @@
 {
-  "correspondingSourceArchiveSHA256": "242518dbb2746bb9590713e6c94e871b549cba835c7a998450354ac87949c654",
+  "correspondingSourceArchiveSHA256": "a44cc9bdc5b647b987ffb5122f42522c8d4ac8764af08941f5190cbf2b36ca22",
   "signalIOS": {
     "repository": "https://github.com/signalapp/Signal-iOS.git",
     "tag": "8.32.0.1910",
@@ -12,7 +12,7 @@
     "sig-demo/ios/upstream.lock.json": "6ba3b8cc77ebd85928adc34b0dfa35262d3f611132474e137e06ceef1e4e0d28",
     "sig-demo/ios/libsignal/source.lock.json": "7642dc2549d1ea3c6a191040d29a214e1fd0fdc88befcf96998d43550f6b8311",
     "sig-demo/ios/LocalModel/source.lock.json": "b9fa31e5cf0f09efa1db9119b9fa7239685da6a567dd2ba7946ee95ca34934ed",
-    "sig-demo/ios/Mesh/source.lock.json": "a22a20eb9dc6d17e349e7a883939e43d17b17ee45c893576ca24feff13596c8d",
+    "sig-demo/ios/Mesh/source.lock.json": "49e8cd2dc7c312a2dfb0d4d5ad6431219478ca5ee4db19212dd3f4f49d6c2d51",
     "sig-demo/ios/PaidMesh/source.lock.json": "d3f8b7416e75729ea05f0a4eb84961ccd3bd2f0aef3231e933c76dbcd1424953",
     "sig-demo/gdk/native-agent/Cargo.lock": "0628592451935f5f856e3960dddfb1893395999d5ecd54674b343dddda2bdec0"
   },

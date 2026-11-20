@@ -25,5 +25,7 @@
     },
     "preserveBundleIdentifier": true,
     "verifyOtherPayloadBytesUnchanged": true
-  }
+  },
+  "deviceStaticArchiveSHA256": "a76f1dd583f93ca8ffaa1e5470016a7f71e6f6bc8e245ecb137db4fe790ecfdc",
+  "deviceWrapperDeploymentTarget": "Matches the device app target used by Xcode for its generated framework stub."
 }

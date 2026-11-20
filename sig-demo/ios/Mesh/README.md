@@ -47,6 +47,14 @@ that archive from the resource/privacy wrapper and creates its normal codeless
 framework stub. Correct executable metadata lets strict staging verify that
 Xcode-produced wrapper while the actual Mesh code remains linked into the app.
 
+For the iOS 17 local-model app, `stage-device.py` makes a build-local device
+package and sets the wrapper's `MinimumOSVersion` to the deployment target
+Xcode uses to link the generated stub. The script verifies the original
+arm64 static archive against `deviceStaticArchiveSHA256` in the lockfile.
+The cached SDK and its original iOS 16 minimum remain available to other
+builds. The archive inspector compares each executable’s deployment load command
+with its own bundle plist and the app’s deployment floor.
+
 The package supplies `Network.framework`, `Security.framework`, `resolv`, and
 macOS `IOKit.framework` in addition to upstream's framework dependencies.
 Normal linker dead stripping is required when linking Mesh and the Sig Rust
