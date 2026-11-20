@@ -54,7 +54,17 @@
      /// Prefix that must be prepended for parser-compatible response reconstruction.
      pub generation_prompt: String,
      /// Whether tool calls should be parsed from the response.
-@@ -1017,14 +1030,8 @@
+@@ -769,7 +782,8 @@
+         name: Option<&str>,
+     ) -> Result<LlamaChatTemplate, ChatTemplateError> {
+         let name_cstr = name.map(CString::new);
+-        let name_ptr = match name_cstr {
++        // Borrow the owner so the named template stays alive through the native lookup.
++        let name_ptr = match &name_cstr {
+             Some(Ok(name)) => name.as_ptr(),
+             _ => std::ptr::null(),
+         };
+@@ -1017,14 +1031,8 @@
                      .to_vec();
                  Some(String::from_utf8(grammar_bytes)?)
              };
@@ -71,7 +81,7 @@
              let generation_prompt = if raw_result.generation_prompt.is_null() {
                  String::new()
              } else {
-@@ -1222,14 +1229,8 @@
+@@ -1222,14 +1230,8 @@
                      .to_vec();
                  Some(String::from_utf8(grammar_bytes)?)
              };
@@ -88,7 +98,7 @@
              let generation_prompt = if raw_result.generation_prompt.is_null() {
                  String::new()
              } else {
-@@ -1348,7 +1349,7 @@
+@@ -1348,7 +1350,7 @@
          is_partial: bool,
      ) -> Result<String, ChatParseError> {
          let text_cstr = CString::new(text)?;
@@ -97,7 +107,7 @@
          let generation_prompt_cstr = if self.generation_prompt.is_empty() {
              None
          } else {
-@@ -1361,9 +1362,7 @@
+@@ -1361,9 +1363,7 @@
                  is_partial,
                  self.chat_format,
                  self.parse_tool_calls,
@@ -108,7 +118,7 @@
                  generation_prompt_cstr
                      .as_ref()
                      .map_or(ptr::null(), |cstr| cstr.as_ptr()),
-@@ -1388,7 +1387,7 @@
+@@ -1388,7 +1388,7 @@
  
      /// Initialize a streaming parser for OpenAI-compatible chat deltas.
      pub fn streaming_state_oaicompat(&self) -> Result<ChatParseStateOaicompat, ChatParseError> {
@@ -117,7 +127,7 @@
          let generation_prompt_cstr = if self.generation_prompt.is_empty() {
              None
          } else {
-@@ -1398,9 +1397,7 @@
+@@ -1398,9 +1398,7 @@
              llama_cpp_sys_2::llama_rs_chat_parse_state_init_oaicompat(
                  self.chat_format,
                  self.parse_tool_calls,

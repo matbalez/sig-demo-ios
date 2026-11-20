@@ -1,5 +1,5 @@
 {
-  "correspondingSourceArchiveSHA256": "a44cc9bdc5b647b987ffb5122f42522c8d4ac8764af08941f5190cbf2b36ca22",
+  "correspondingSourceArchiveSHA256": "00f782863d924eed395c26f8b6b25f756e6e3f88f41e77f25a313ada56948ddd",
   "signalIOS": {
     "repository": "https://github.com/signalapp/Signal-iOS.git",
     "tag": "8.32.0.1910",
